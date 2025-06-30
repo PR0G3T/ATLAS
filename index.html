@@ -2,19 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ATLAS Interface</title>
+    <title>ATLAS - Interface</title>
     <link rel="stylesheet" href="css/style.css">
+    <meta name="google" content="notranslate">
+    <meta http-equiv="Content-Language" content="en">
 </head>
 <body>
-    <div class="container">
+    <!-- Full-page layout, no container -->
+    <div class="atlas-header">
         <h1>ATLAS</h1>
-        <form id="atlas-form">
-            <input type="text" id="prompt" placeholder="Ask your question..." required autocomplete="off" />
-            <button type="submit">Send</button>
-        </form>
-        <div class="response" id="response"></div>
-        <div class="error" id="error"></div>
     </div>
-    <script src="js/main.js"></script>
+    <div class="atlas-messages" id="chat-messages"></div>
+    <form id="atlas-form" class="atlas-form">
+        <input type="text" id="prompt" placeholder="Type your message..." required autocomplete="off" />
+        <button type="submit"><span>&#9658;</span></button>
+    </form>
+    <div id="toast-container"></div>
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

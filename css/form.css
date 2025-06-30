@@ -1,0 +1,38 @@
+.atlas-form {
+    display: flex;
+    gap: 10px;
+    padding: 18px 24px;
+    background: #40414f;
+    border-top: 1px solid #353740;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+#prompt {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #353740;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    background: #343541;
+    color: #ececf1;
+}
+
+button[type="submit"] {
+    padding: 0 22px;
+    background: #19c37d;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+button[type="submit"]:hover {
+    background: #13a06d;
+}

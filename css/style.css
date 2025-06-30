@@ -1,70 +1,157 @@
+@import url('https://fonts.googleapis.com/css?family=Segoe+UI:400,700&display=swap');
+
+@import './layout.css';
+@import './chat.css';
+@import './form.css';
+@import './toast.css';
+
 body {
-    font-family: Arial, sans-serif;
-    background: #181a1b;
-    color: #e0e0e0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #343541;
+    color: #ececf1;
     margin: 0;
     padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-.container {
-    max-width: 500px;
-    margin: 40px auto;
-    background: #23272a;
-    padding: 30px 40px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.6);
-}
-
-h1 {
+.atlas-header {
+    background: #202123;
+    padding: 24px 0 16px 0;
     text-align: center;
-    color: #e0e0e0;
-    margin-bottom: 24px;
+    border-bottom: 1px solid #353740;
 }
 
-#atlas-form {
+.atlas-header h1 {
+    color: #ececf1;
+    font-size: 2.2rem;
+    margin: 0;
+    letter-spacing: 2px;
+}
+
+.atlas-messages {
+    flex: 1;
+    padding: 32px 24px 24px 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    background: #343541;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.message {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    max-width: 90%;
+}
+
+.message.user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.message .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #19c37d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.message.user .avatar {
+    background: #007bff;
+}
+
+.message .bubble {
+    background: #444654;
+    color: #ececf1;
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.message.user .bubble {
+    background: #007bff;
+    color: #fff;
+}
+
+.atlas-form {
     display: flex;
     gap: 10px;
-    margin-bottom: 20px;
+    padding: 18px 24px;
+    background: #40414f;
+    border-top: 1px solid #353740;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
 }
 
 #prompt {
     flex: 1;
-    padding: 10px;
-    border: 1px solid #444;
-    border-radius: 4px;
-    font-size: 16px;
-    background: #181a1b;
-    color: #e0e0e0;
+    padding: 12px;
+    border: 1px solid #353740;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    background: #343541;
+    color: #ececf1;
 }
 
 button[type="submit"] {
-    padding: 10px 20px;
-    background: #007bff;
+    padding: 0 22px;
+    background: #19c37d;
     color: #fff;
     border: none;
-    border-radius: 4px;
-    font-size: 16px;
+    border-radius: 6px;
+    font-size: 1.3rem;
     cursor: pointer;
     transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 button[type="submit"]:hover {
-    background: #0056b3;
+    background: #13a06d;
 }
 
-.response {
-    background: #232d23;
-    color: #b6fcb6;
-    padding: 12px;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    min-height: 24px;
+#toast-container {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    pointer-events: none;
 }
 
-.error {
-    background: #3a1a1a;
-    color: #ffb3b3;
-    padding: 12px;
-    border-radius: 4px;
-    min-height: 24px;
+.toast {
+    background: #222;
+    color: #fff;
+    padding: 16px 28px;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+    font-size: 1.08rem;
+    opacity: 0.96;
+    animation: toast-in 0.3s;
+    pointer-events: auto;
+}
+
+@keyframes toast-in {
+    from { transform: translateY(40px) scale(0.98); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 0.96; }
 }

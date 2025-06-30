@@ -1,0 +1,56 @@
+.atlas-messages {
+    flex: 1;
+    padding: 32px 24px 24px 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    background: #343541;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.message {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    max-width: 90%;
+}
+
+.message.user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.message .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #19c37d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.message.user .avatar {
+    background: #007bff;
+}
+
+.message .bubble {
+    background: #444654;
+    color: #ececf1;
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.message.user .bubble {
+    background: #007bff;
+    color: #fff;
+}

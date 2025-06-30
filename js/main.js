@@ -1,16 +1,15 @@
+import { addMessage } from './addMessage.js';
+import { showToast } from './showToast.js';
+
 document.getElementById('atlas-form').addEventListener('submit', function(e) {
     e.preventDefault();
     const prompt = document.getElementById('prompt').value.trim();
-    const responseDiv = document.getElementById('response');
-    const errorDiv = document.getElementById('error');
-    responseDiv.textContent = '';
-    errorDiv.textContent = '';
-
     if (!prompt) {
-        errorDiv.textContent = 'Veuillez entrer une question.';
+        showToast('Veuillez entrer une question.', 'error');
         return;
     }
-
+    addMessage(prompt, 'user');
+    document.getElementById('prompt').value = '';
     fetch('https://rds.teamcardinalis.com/atlas/ask', {
         method: 'POST',
         headers: {
@@ -23,9 +22,11 @@ document.getElementById('atlas-form').addEventListener('submit', function(e) {
         return response.json();
     })
     .then(data => {
-        responseDiv.textContent = data.response || 'Aucune réponse.';
+        addMessage(data.response || 'Aucune réponse.', 'ai');
     })
     .catch(err => {
-        errorDiv.textContent = err.message || 'Erreur inconnue.';
+        showToast('Erreur : ' + (err.message || 'Erreur inconnue.'), 'error');
     });
 });
+
+const chatMessages = document.getElementById('chat-messages');
