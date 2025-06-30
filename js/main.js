@@ -1,15 +1,27 @@
 import { addMessage } from './addMessage.js';
 import { showToast } from './showToast.js';
 
+let isWaiting = false;
+
 document.getElementById('atlas-form').addEventListener('submit', function(e) {
     e.preventDefault();
-    const prompt = document.getElementById('prompt').value.trim();
+    if (isWaiting) {
+        showToast('Veuillez attendre la réponse avant de poser une nouvelle question.', 'error');
+        return;
+    }
+    const promptInput = document.getElementById('prompt');
+    const prompt = promptInput.value.trim();
     if (!prompt) {
         showToast('Veuillez entrer une question.', 'error');
         return;
     }
+    isWaiting = true;
+    promptInput.disabled = true;
+    const submitBtn = this.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+
     addMessage(prompt, 'user');
-    document.getElementById('prompt').value = '';
+    promptInput.value = '';
     fetch('https://rds.teamcardinalis.com/atlas/ask', {
         method: 'POST',
         headers: {
@@ -26,6 +38,12 @@ document.getElementById('atlas-form').addEventListener('submit', function(e) {
     })
     .catch(err => {
         showToast('Erreur : ' + (err.message || 'Erreur inconnue.'), 'error');
+    })
+    .finally(() => {
+        isWaiting = false;
+        promptInput.disabled = false;
+        if (submitBtn) submitBtn.disabled = false;
+        promptInput.focus();
     });
 });
 
