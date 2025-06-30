@@ -30,7 +30,7 @@ function handlePromptSubmit(e) {
     addMessage(prompt, 'user');
 
     if (promptInput) promptInput.value = '';
-    fetch('https://rds.teamcardinalis.com/atlas/ask', {
+    fetch('https://rds.teamcardinalis.com/atlas/prompt', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
