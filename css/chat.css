@@ -5,8 +5,8 @@
     display: flex;
     flex-direction: column;
     gap: 18px;
-    background: #343541;
-    max-width: 900px;
+    background: var(--form-input-bg);
+    max-width: var(--form-max-width);
     margin: 0 auto;
     width: 100%;
 }
@@ -27,11 +27,11 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: #19c37d;
+    background: var(--form-btn-bg);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
+    color: var(--form-btn-color);
     font-weight: bold;
     font-size: 1.1rem;
 }
@@ -42,7 +42,7 @@
 
 .message .bubble {
     background: #444654;
-    color: #ececf1;
+    color: var(--form-input-color);
     padding: 14px 18px;
     border-radius: 12px;
     font-size: 1.05rem;

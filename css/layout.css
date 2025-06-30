@@ -1,7 +1,7 @@
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
-    background: #343541;
-    color: #ececf1;
+    background: var(--form-input-bg);
+    color: var(--form-input-color);
     margin: 0;
     padding: 0;
     min-height: 100vh;

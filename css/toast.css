@@ -12,10 +12,10 @@
 }
 
 .toast {
-    background: #222;
-    color: #fff;
+    background: var(--form-input-bg);
+    color: var(--form-input-color);
     padding: 16px 28px;
-    border-radius: 8px;
+    border-radius: var(--form-radius);
     box-shadow: 0 2px 12px rgba(0,0,0,0.18);
     font-size: 1.08rem;
     opacity: 0.96;

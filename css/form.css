@@ -1,37 +1,37 @@
 .atlas-form {
-    size: fit-content;
     position: fixed;
     left: 50%;
     bottom: 0;
     transform: translateX(-50%);
     z-index: 10000;
-    max-width: 900px;
+    max-width: var(--form-max-width);
     width: 100%;
     margin: 0 auto;
     display: flex;
-    gap: 10px;
-    padding: 10px;
-    background: #40414f;
-    border-radius: 7px;
+    gap: var(--form-gap);
+    padding: var(--form-padding);
+    background: var(--form-bg);
+    border-radius: var(--form-radius);
+    border: var(--form-border);
     margin-bottom: 25px;
 }
 
 #prompt {
     flex: 1;
     padding: 12px;
-    border: 1px solid #353740;
-    border-radius: 6px;
+    border: var(--form-border);
+    border-radius: var(--form-btn-radius);
     font-size: 1.1rem;
-    background: #343541;
-    color: #ececf1;
+    background: var(--form-input-bg);
+    color: var(--form-input-color);
 }
 
 button[type="submit"] {
     padding: 0 22px;
-    background: #19c37d;
-    color: #fff;
+    background: var(--form-btn-bg);
+    color: var(--form-btn-color);
     border: none;
-    border-radius: 6px;
+    border-radius: var(--form-btn-radius);
     font-size: 1.3rem;
     cursor: pointer;
     transition: background 0.2s;
@@ -41,5 +41,5 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover {
-    background: #13a06d;
+    background: var(--form-btn-bg-hover);
 }
