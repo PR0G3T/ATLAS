@@ -36,7 +36,6 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: var(--form-btn-bg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -44,10 +43,6 @@
     font-weight: bold;
     font-size: 1.1rem;
     font-family: 'Inter', Arial, sans-serif;
-}
-
-.message.user .avatar {
-    background: #007bff;
 }
 
 .message .bubble {
