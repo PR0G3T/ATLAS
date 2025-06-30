@@ -11,7 +11,6 @@ document.getElementById('atlas-form').addEventListener('submit', function(e) {
         return;
     }
 
-    // Appel API réel
     fetch('https://rds.teamcardinalis.com/atlas/ask', {
         method: 'POST',
         headers: {
