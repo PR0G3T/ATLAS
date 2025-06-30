@@ -1,5 +1,10 @@
-.atlas-messages {
-    flex: 1;
+#chat-messages {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    /* Ajustez la hauteur pour laisser de la place à la barre d'entrée */
+    bottom: 70px;
     padding: 32px 24px 24px 24px;
     overflow-y: auto;
     display: flex;
@@ -8,7 +13,11 @@
     background: var(--form-input-bg);
     max-width: var(--form-max-width);
     margin: 0 auto;
-    width: 100%;
+    width: 100vw; /* Correction : occupe toute la largeur de la fenêtre */
+    box-sizing: border-box;
+    z-index: 1; /* S'assurer que c'est sous la barre d'entrée */
+    /* Ajout d'un fond pour la visibilité */
+    /* background: var(--form-input-bg); déjà présent */
 }
 
 .message {
@@ -34,6 +43,7 @@
     color: var(--form-btn-color);
     font-weight: bold;
     font-size: 1.1rem;
+    font-family: 'Inter', Arial, sans-serif;
 }
 
 .message.user .avatar {

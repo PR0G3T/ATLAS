@@ -3,13 +3,19 @@ import { showToast } from './showToast.js';
 
 let isWaiting = false;
 
-document.getElementById('atlas-form').addEventListener('submit', function(e) {
-    e.preventDefault();
+const promptInput = document.getElementById('messageInput'); // Utiliser uniquement 'messageInput'
+const sendButton = document.getElementById('sendButton');
+const form = document.getElementById('atlas-form'); // Récupérer le formulaire
+
+console.log('promptInput:', promptInput); // Debug
+console.log('form:', form); // Debug
+
+function handlePromptSubmit(e) {
+    if (e) e.preventDefault();
     if (isWaiting) {
         showToast('Veuillez attendre la réponse avant de poser une nouvelle question.', 'error');
         return;
     }
-    const promptInput = document.getElementById('prompt');
     const prompt = promptInput.value.trim();
     if (!prompt) {
         showToast('Veuillez entrer une question.', 'error');
@@ -17,10 +23,10 @@ document.getElementById('atlas-form').addEventListener('submit', function(e) {
     }
     isWaiting = true;
     promptInput.disabled = true;
-    const submitBtn = this.querySelector('button[type="submit"]');
-    if (submitBtn) submitBtn.disabled = true;
+    if (sendButton) sendButton.disabled = true;
 
     addMessage(prompt, 'user');
+
     promptInput.value = '';
     fetch('https://rds.teamcardinalis.com/atlas/ask', {
         method: 'POST',
@@ -42,9 +48,22 @@ document.getElementById('atlas-form').addEventListener('submit', function(e) {
     .finally(() => {
         isWaiting = false;
         promptInput.disabled = false;
-        if (submitBtn) submitBtn.disabled = false;
+        if (sendButton) sendButton.disabled = false;
         promptInput.focus();
     });
-});
+}
 
-const chatMessages = document.getElementById('chat-messages');
+// Ajout d'un écouteur sur le formulaire pour la soumission
+if (form) {
+    form.addEventListener('submit', handlePromptSubmit);
+    console.log('Form submit listener added'); // Debug
+}
+
+// Optionnel : Entrée clavier sur l'input (Enter)
+if (promptInput) {
+    promptInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            // Le submit du formulaire gère déjà l'envoi, donc rien à faire ici
+        }
+    });
+}

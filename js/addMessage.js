@@ -1,5 +1,10 @@
 export function addMessage(text, sender = 'user') {
     const chatMessages = document.getElementById('chat-messages');
+    if (!chatMessages) {
+        console.warn('chat-messages element not found');
+        return;
+    }
+    console.log('addMessage called', { text, sender }); // Debug
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}`;
     const avatar = document.createElement('div');
@@ -11,5 +16,6 @@ export function addMessage(text, sender = 'user') {
     messageDiv.appendChild(avatar);
     messageDiv.appendChild(bubble);
     chatMessages.appendChild(messageDiv);
+    // Scroll to bottom after adding message
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
