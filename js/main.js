@@ -11,8 +11,22 @@ document.getElementById('atlas-form').addEventListener('submit', function(e) {
         return;
     }
 
-    // Simuler une réponse (à remplacer par un appel API réel)
-    setTimeout(() => {
-        responseDiv.textContent = `Réponse simulée pour : "${prompt}"`;
-    }, 700);
+    // Appel API réel
+    fetch('https://rds.teamcardinalis.com/atlas/ask', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ prompt })
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Erreur serveur');
+        return response.json();
+    })
+    .then(data => {
+        responseDiv.textContent = data.response || 'Aucune réponse.';
+    })
+    .catch(err => {
+        errorDiv.textContent = err.message || 'Erreur inconnue.';
+    });
 });
