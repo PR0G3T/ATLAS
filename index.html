@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>ATLAS LLM Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 2em;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1em;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 0.5em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        button {
+            padding: 0.5em 1.2em;
+            background: #0078d7;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        button:disabled {
+            background: #aaa;
+        }
+        .response {
+            background: #f0f6ff;
+            border-left: 4px solid #0078d7;
+            padding: 1em;
+            border-radius: 4px;
+            min-height: 2em;
+            white-space: pre-wrap;
+        }
+        .error {
+            color: #d70022;
+            margin-top: 1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ATLAS LLM</h1>
+        <form id="llm-form">
+            <input type="text" id="prompt" placeholder="Posez votre question..." required autocomplete="off" />
+            <button type="submit">Envoyer</button>
+        </form>
+        <div class="response" id="response"></div>
+        <div class="error" id="error"></div>
+    </div>
+    <script>
+        const form = document.getElementById('llm-form');
+        const promptInput = document.getElementById('prompt');
+        const responseDiv = document.getElementById('response');
+        const errorDiv = document.getElementById('error');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            responseDiv.textContent = '';
+            errorDiv.textContent = '';
+            form.querySelector('button').disabled = true;
+
+            try {
+                const res = await fetch('https://rds.teamcardinalis.com/atlas/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: promptInput.value })
+                });
+                if (!res.ok) throw new Error('Erreur du serveur');
+                const data = await res.json();
+                responseDiv.textContent = data.response || JSON.stringify(data);
+            } catch (err) {
+                errorDiv.textContent = err.message;
+            } finally {
+                form.querySelector('button').disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
