@@ -1,20 +1,9 @@
 #chat-messages {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 70px;
-    padding: 32px 24px 24px 24px;
+    flex: 1;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 18px;
-    background: var(--form-input-bg);
-    max-width: var(--form-max-width);
-    margin: 0 auto;
-    width: 100vw; /* Correction : occupe toute la largeur de la fenêtre */
-    box-sizing: border-box;
-    z-index: 1; /* S'assurer que c'est sous la barre d'entrée */
 }
 
 .message {
@@ -37,14 +26,15 @@
     align-items: center;
     justify-content: center;
     color: var(--form-btn-color);
+    background: var(--form-btn-bg);
     font-weight: bold;
     font-size: 1.1rem;
     font-family: 'Inter', Arial, sans-serif;
 }
 
 .message .bubble {
-    background: #444654;
-    color: var(--form-input-color);
+    background: #e3e8f0;
+    color: var(--text-color);
     padding: 14px 18px;
     border-radius: 12px;
     font-size: 1.05rem;
@@ -53,5 +43,6 @@
 }
 
 .message.user .bubble {
+    background: var(--form-btn-bg);
     color: #fff;
 }
