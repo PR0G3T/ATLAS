@@ -1,4 +1,5 @@
 .atlas-form {
+    size: fit-content;
     position: fixed;
     left: 50%;
     bottom: 0;
@@ -9,11 +10,10 @@
     margin: 0 auto;
     display: flex;
     gap: 10px;
-    padding: 18px 24px;
+    padding: 10px;
     background: #40414f;
-    border-top: 1px solid #353740;
-    /* Ajout d'une ombre pour le détacher visuellement */
-    box-shadow: 0 -2px 16px rgba(0,0,0,0.18);
+    border-radius: 7px;
+    margin-bottom: 25px;
 }
 
 #prompt {
