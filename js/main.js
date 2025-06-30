@@ -26,6 +26,7 @@ function handlePromptSubmit(e) {
     isWaiting = true;
     if (promptInput) promptInput.disabled = true;
     if (sendButton) sendButton.disabled = true;
+    //lol
 
     addMessage(prompt, 'user');
 
