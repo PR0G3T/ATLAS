@@ -16,18 +16,19 @@ function handlePromptSubmit(e) {
         showToast('Veuillez attendre la réponse avant de poser une nouvelle question.', 'error');
         return;
     }
-    const prompt = promptInput.value.trim();
+    // Correction ici : vérifier que promptInput existe avant d'accéder à sa valeur
+    const prompt = promptInput ? promptInput.value.trim() : '';
     if (!prompt) {
         showToast('Veuillez entrer une question.', 'error');
         return;
     }
     isWaiting = true;
-    promptInput.disabled = true;
+    if (promptInput) promptInput.disabled = true;
     if (sendButton) sendButton.disabled = true;
 
     addMessage(prompt, 'user');
 
-    promptInput.value = '';
+    if (promptInput) promptInput.value = '';
     fetch('https://rds.teamcardinalis.com/atlas/ask', {
         method: 'POST',
         headers: {
@@ -47,9 +48,9 @@ function handlePromptSubmit(e) {
     })
     .finally(() => {
         isWaiting = false;
-        promptInput.disabled = false;
+        if (promptInput) promptInput.disabled = false;
         if (sendButton) sendButton.disabled = false;
-        promptInput.focus();
+        if (promptInput) promptInput.focus();
     });
 }
 
@@ -57,6 +58,17 @@ function handlePromptSubmit(e) {
 if (form) {
     form.addEventListener('submit', handlePromptSubmit);
     console.log('Form submit listener added'); // Debug
+}
+
+// Ajout d'un écouteur sur le bouton d'envoi si ce n'est pas un bouton de type submit
+if (sendButton && form) {
+    sendButton.addEventListener('click', (e) => {
+        // Si le bouton n'est pas de type submit, on déclenche la soumission du formulaire
+        if (sendButton.type !== 'submit') {
+            e.preventDefault();
+            form.requestSubmit ? form.requestSubmit() : handlePromptSubmit(e);
+        }
+    });
 }
 
 // Optionnel : Entrée clavier sur l'input (Enter)
