@@ -16,20 +16,6 @@ body {
     flex-direction: column;
 }
 
-.atlas-header {
-    background: #202123;
-    padding: 24px 0 16px 0;
-    text-align: center;
-    border-bottom: 1px solid #353740;
-}
-
-.atlas-header h1 {
-    color: #ececf1;
-    font-size: 2.2rem;
-    margin: 0;
-    letter-spacing: 2px;
-}
-
 .atlas-messages {
     flex: 1;
     padding: 32px 24px 24px 24px;
@@ -41,6 +27,7 @@ body {
     max-width: 900px;
     margin: 0 auto;
     width: 100%;
+    padding-bottom: 90px;
 }
 
 .message {
