@@ -16,8 +16,9 @@ function handlePromptSubmit(e) {
         showToast('Veuillez attendre la réponse avant de poser une nouvelle question.', 'error');
         return;
     }
-    // Correction ici : vérifier que promptInput existe avant d'accéder à sa valeur
+    // Ajout d'un log pour diagnostiquer la valeur lue
     const prompt = promptInput ? promptInput.value.trim() : '';
+    console.log('Valeur du promptInput:', promptInput ? promptInput.value : '(input non trouvé)');
     if (!prompt) {
         showToast('Veuillez entrer une question.', 'error');
         return;
