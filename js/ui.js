@@ -52,30 +52,6 @@ export function showChatInterface() {
     const messageBox = document.createElement('div');
     messageBox.className = 'messageBox';
     
-    // ADD: File upload wrapper with proper accessibility
-    const fileWrapper = document.createElement('div');
-    fileWrapper.className = 'fileUploadWrapper';
-    
-    const fileLabel = document.createElement('label');
-    fileLabel.setAttribute('for', 'file');
-    fileLabel.setAttribute('aria-label', 'Upload image file');
-    
-    // ADD: SVG creation (safer than innerHTML)
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('viewBox', '0 0 337 337');
-    svg.setAttribute('fill', 'none');
-    // ... create SVG elements programmatically ...
-    
-    const tooltip = document.createElement('span');
-    tooltip.className = 'tooltip';
-    tooltip.textContent = 'Add an image';
-    
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.id = 'file';
-    fileInput.name = 'file';
-    fileInput.accept = 'image/*'; // ADD: Restrict to images
-    
     const textarea = document.createElement('textarea');
     textarea.placeholder = 'Message...';
     textarea.id = 'messageInput';
@@ -90,12 +66,6 @@ export function showChatInterface() {
     sendButton.setAttribute('aria-label', 'Send message');
     
     // Assemble the DOM structure
-    fileLabel.appendChild(svg);
-    fileLabel.appendChild(tooltip);
-    fileWrapper.appendChild(fileLabel);
-    fileWrapper.appendChild(fileInput);
-    
-    messageBox.appendChild(fileWrapper);
     messageBox.appendChild(textarea);
     messageBox.appendChild(sendButton);
     

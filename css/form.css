@@ -18,59 +18,6 @@
   border-color: var(--accent-primary);
 }
 
-.fileUploadWrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  align-self: center;
-}
-
-#file {
-  display: none;
-}
-
-.fileUploadWrapper label {
-    cursor: pointer;
-}
-
-.fileUploadWrapper svg {
-    width: 24px;
-    height: 24px;
-}
-
-.fileUploadWrapper svg circle, .fileUploadWrapper svg path {
-    stroke: var(--text-secondary);
-    transition: stroke 0.2s ease;
-}
-
-.fileUploadWrapper label:hover svg circle, .fileUploadWrapper label:hover svg path {
-    stroke: var(--text-primary);
-}
-
-.tooltip {
-  position: absolute;
-  bottom: 125%; /* Position above the icon */
-  left: 50%;
-  transform: translateX(-50%);
-  display: none;
-  opacity: 0;
-  color: var(--text-primary);
-  font-size: 12px;
-  text-wrap: nowrap;
-  background-color: var(--background-tertiary);
-  padding: 6px 10px;
-  border-radius: 5px;
-  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s;
-  z-index: 10;
-}
-
-.fileUploadWrapper:hover .tooltip {
-    display: block;
-    opacity: 1;
-}
-
 #messageInput {
   flex-grow: 1;
   background-color: transparent;
