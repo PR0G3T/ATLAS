@@ -1,6 +1,6 @@
 import { updateConversation, getCurrentConversationId } from './conversationHistory.js';
 
-export function addMessage(text, sender = 'user') {
+export function addMessage(text, sender = 'user', saveToHistory = true) {
     const chatMessages = document.getElementById('chat-messages');
     if (!chatMessages) {
         console.warn('chat-messages element not found');
@@ -22,14 +22,16 @@ export function addMessage(text, sender = 'user') {
 
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    // Save message to conversation history
-    const conversationId = getCurrentConversationId();
-    if (conversationId) {
-        const message = {
-            text,
-            sender,
-            timestamp: Date.now()
-        };
-        updateConversation(conversationId, message);
+    // Save message to conversation history only when requested
+    if (saveToHistory) {
+        const conversationId = getCurrentConversationId();
+        if (conversationId) {
+            const message = {
+                text,
+                sender,
+                timestamp: Date.now()
+            };
+            updateConversation(conversationId, message);
+        }
     }
 }
