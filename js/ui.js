@@ -144,6 +144,19 @@ function setupChatHandlers() {
         promptInput.focus();
     }
 
+    // ADD: Debounced conversation switching
+    let conversationSwitchTimeout = null;
+    
+    function debouncedLoadConversation(conversationId) {
+        if (conversationSwitchTimeout) {
+            clearTimeout(conversationSwitchTimeout);
+        }
+        
+        conversationSwitchTimeout = setTimeout(() => {
+            loadConversation(conversationId);
+        }, 100); // 100ms debounce
+    }
+
     // Setup new chat button handler with proper event delegation
     document.addEventListener('click', (e) => {
         // Handle new chat button clicks
@@ -154,13 +167,14 @@ function setupChatHandlers() {
             return;
         }
         
-        // Handle conversation item clicks
+        // Handle conversation item clicks with debouncing
         const conversationItem = e.target.closest('.conversation-item');
         if (conversationItem) {
             e.preventDefault();
+            e.stopPropagation();
             const conversationId = conversationItem.dataset.conversationId;
             if (conversationId) {
-                loadConversation(conversationId);
+                debouncedLoadConversation(conversationId);
             }
         }
     });

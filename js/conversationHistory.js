@@ -4,6 +4,10 @@ const CURRENT_CONVERSATION_KEY = 'atlas_current_conversation';
 const MAX_CONVERSATIONS = 100; // Limit to prevent storage bloat
 const MAX_MESSAGES_PER_CONVERSATION = 1000;
 
+// ADD: Loading state management
+let isLoadingConversation = false;
+let loadingTimeout = null;
+
 /**
  * Gets all conversations from localStorage
  */
@@ -152,36 +156,63 @@ export function getCurrentConversation() {
  * Loads a conversation by ID
  */
 export function loadConversation(conversationId) {
+    // Prevent rapid switching
+    if (isLoadingConversation) {
+        console.log('Already loading a conversation, ignoring request');
+        return;
+    }
+    
+    // Clear any pending loading timeout
+    if (loadingTimeout) {
+        clearTimeout(loadingTimeout);
+    }
+    
     const conversations = getConversations();
     const conversation = conversations.find(c => c.id === conversationId);
     
-    if (conversation) {
-        setCurrentConversation(conversationId);
-        
-        // Clear current messages with proper cleanup
-        const chatMessages = document.getElementById('chat-messages');
-        if (chatMessages) {
-            // Remove all existing message elements
-            while (chatMessages.firstChild) {
-                chatMessages.removeChild(chatMessages.firstChild);
-            }
-        }
-        
-        // Load messages with proper async handling to prevent race conditions
-        if (conversation.messages && conversation.messages.length > 0) {
-            Promise.resolve().then(async () => {
+    if (!conversation) {
+        console.warn('Conversation not found:', conversationId);
+        return;
+    }
+    
+    // Set loading state
+    isLoadingConversation = true;
+    setCurrentConversation(conversationId);
+    
+    // Clear current messages with proper cleanup
+    const chatMessages = document.getElementById('chat-messages');
+    if (chatMessages) {
+        // Use more efficient cleanup
+        chatMessages.textContent = '';
+    }
+    
+    // Load messages with debouncing and proper async handling
+    loadingTimeout = setTimeout(async () => {
+        try {
+            if (conversation.messages && conversation.messages.length > 0) {
                 const { addMessage } = await import('./addMessage.js');
                 
-                // Add messages sequentially to prevent duplication
-                for (const message of conversation.messages) {
-                    // Create message element directly without saving to conversation again
-                    addMessageToDOM(message.text, message.sender);
+                // Add messages sequentially with proper cleanup flag
+                for (let i = 0; i < conversation.messages.length; i++) {
+                    const message = conversation.messages[i];
+                    // Only add to DOM, don't save to conversation again
+                    addMessage(message.text, message.sender, false);
+                    
+                    // Small delay to prevent UI blocking on large conversations
+                    if (i % 10 === 0) {
+                        await new Promise(resolve => setTimeout(resolve, 0));
+                    }
                 }
-            });
+            }
+            
+            renderConversationHistory();
+        } catch (error) {
+            console.error('Error loading conversation messages:', error);
+        } finally {
+            isLoadingConversation = false;
+            loadingTimeout = null;
         }
-        
-        renderConversationHistory();
-    }
+    }, 50); // Debounce delay
 }
 
 /**
