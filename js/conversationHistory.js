@@ -223,15 +223,3 @@ export function deleteConversation(conversationId) {
     
     renderConversationHistory();
 }
-export function deleteConversation(conversationId) {
-    const conversations = getConversations();
-    const updatedConversations = conversations.filter(c => c.id !== conversationId);
-    saveConversations(updatedConversations);
-    
-    // If this was the current conversation, clear it
-    if (getCurrentConversationId() === conversationId) {
-        sessionStorage.removeItem(CURRENT_CONVERSATION_KEY);
-    }
-    
-    renderConversationHistory();
-}
