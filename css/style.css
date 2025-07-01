@@ -167,19 +167,6 @@ html, body {
     border-radius: 3px;
 }
 
-.welcome-message {
-    text-align: center;
-    padding: var(--spacing-xl);
-    color: var(--text-secondary);
-}
-
-.welcome-message h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: var(--spacing-sm);
-    color: var(--text-primary);
-}
-
 .message {
     display: flex;
     gap: var(--spacing-md);
