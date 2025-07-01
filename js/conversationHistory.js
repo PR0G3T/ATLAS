@@ -72,15 +72,10 @@ export function createNewConversation() {
         updatedAt: Date.now()
     };
     
-    console.log('Creating new conversation:', conversation);
-    
     const conversations = getConversations();
     conversations.unshift(conversation);
     saveConversations(conversations);
     setCurrentConversation(conversationId);
-    
-    console.log('New conversation created and set as current:', conversationId);
-    console.log('Total conversations:', conversations.length);
     
     // Force immediate render with a small delay to ensure DOM is ready
     setTimeout(() => {
@@ -184,8 +179,6 @@ export function loadConversation(conversationId) {
  * Renders the conversation history in the sidebar
  */
 export function renderConversationHistory() {
-    console.log('Rendering conversation history...');
-    
     const conversationHistory = document.querySelector('.conversation-history');
     if (!conversationHistory) {
         console.warn('Conversation history element not found');
@@ -195,9 +188,6 @@ export function renderConversationHistory() {
     const conversations = getConversations();
     const currentConversationId = getCurrentConversationId();
     
-    console.log('Found', conversations.length, 'conversations');
-    console.log('Current conversation ID:', currentConversationId);
-    
     if (conversations.length === 0) {
         conversationHistory.innerHTML = '<div class="no-conversations">No conversations yet</div>';
         return;
@@ -205,7 +195,6 @@ export function renderConversationHistory() {
     
     const conversationHTML = conversations.map(conversation => {
         const isActive = conversation.id === currentConversationId;
-        console.log(`Conversation ${conversation.id}: active=${isActive}, title="${conversation.title}"`);
         
         return `
             <a href="#" class="conversation-item ${isActive ? 'active' : ''}" 
@@ -217,12 +206,23 @@ export function renderConversationHistory() {
     }).join('');
     
     conversationHistory.innerHTML = conversationHTML;
-    console.log('Conversation history rendered successfully');
 }
 
 /**
  * Deletes a conversation
  */
+export function deleteConversation(conversationId) {
+    const conversations = getConversations();
+    const updatedConversations = conversations.filter(c => c.id !== conversationId);
+    saveConversations(updatedConversations);
+    
+    // If this was the current conversation, clear it
+    if (getCurrentConversationId() === conversationId) {
+        sessionStorage.removeItem(CURRENT_CONVERSATION_KEY);
+    }
+    
+    renderConversationHistory();
+}
 export function deleteConversation(conversationId) {
     const conversations = getConversations();
     const updatedConversations = conversations.filter(c => c.id !== conversationId);

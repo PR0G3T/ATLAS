@@ -100,17 +100,13 @@ async function handlePromptSubmit(e) {
 let eventListenersAttached = false;
 
 function initializeApp() {
-    console.log('Initializing app...');
-    
     // Clear any example sessions first
     clearExampleSessions();
     
     // Always show chat interface, create session if needed
     if (!isLoggedIn() || !isSessionValid()) {
-        console.log('Creating new local session...');
         createLocalSession();
     } else {
-        console.log('Using existing session');
         showChatInterface();
     }
     
@@ -118,11 +114,7 @@ function initializeApp() {
     let conversationId = getCurrentConversationId();
     const conversations = getConversations();
     
-    console.log('Current conversation ID:', conversationId);
-    console.log('Available conversations:', conversations.length);
-    
     if (!conversationId || conversations.length === 0) {
-        console.log('Creating initial conversation...');
         const newConversation = createNewConversation();
         conversationId = newConversation.id;
     }
@@ -134,8 +126,6 @@ function initializeApp() {
     
     // Attach event listeners only once
     if (!eventListenersAttached) {
-        console.log('Attaching event listeners...');
-        
         // Form submission handler
         document.addEventListener('submit', (e) => {
             if (e.target.id === 'atlas-form') {
@@ -144,7 +134,6 @@ function initializeApp() {
         });
         
         eventListenersAttached = true;
-        console.log('Event listeners attached');
     }
 }
 

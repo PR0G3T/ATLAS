@@ -117,14 +117,11 @@ export function showChatInterface() {
  * Starts a new chat by clearing messages
  */
 export function startNewChat() {
-    console.log('Starting new chat...');
-    
     // End current session and start fresh
     endSession();
     
     // Create new conversation FIRST
     const conversation = createNewConversation();
-    console.log('Created new conversation:', conversation.id);
     
     const chatMessages = document.getElementById('chat-messages');
     if (chatMessages) {
@@ -191,7 +188,6 @@ function setupChatHandlers() {
         if (e.target.closest('.new-chat-btn')) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('New chat button clicked via delegation');
             startNewChat();
             return;
         }
@@ -202,7 +198,6 @@ function setupChatHandlers() {
             e.preventDefault();
             const conversationId = conversationItem.dataset.conversationId;
             if (conversationId) {
-                console.log('Loading conversation:', conversationId);
                 loadConversation(conversationId);
             }
         }

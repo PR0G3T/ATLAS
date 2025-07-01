@@ -129,7 +129,6 @@ export function clearExampleSessions() {
             // Check if this looks like example data
             if (isExampleSession(session)) {
                 sessionStorage.removeItem(SESSION_KEY);
-                console.log('Removed example session data');
             }
         }
     } catch (error) {
