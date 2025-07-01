@@ -34,9 +34,10 @@
     align-items: flex-start;
     gap: 16px;
     max-width: 95%;
-    
-    /* Better spacing and focus states */
     position: relative;
+    /* ADD: Better performance with GPU acceleration */
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 /* Focus indicators for accessibility */
@@ -123,4 +124,31 @@
         font-size: 0.9rem;
         padding: 10px 14px;
     }
+}
+
+/* ADD: Loading and error states */
+.loading-messages,
+.error-messages {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.loading-messages::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--text-secondary);
+    border-top: 2px solid var(--accent-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 12px;
+}
+
+.error-messages {
+    color: var(--error-color);
 }

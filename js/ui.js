@@ -101,25 +101,25 @@ export function startNewSession() {
         promptInput.focus();
     }
     
-    // Force render session history
-    setTimeout(() => {
-        renderSessionHistory();
-    }, 100);
+    // Force render session history immediately
+    renderSessionHistory();
 }
 
 /**
- * Sets up session interface event handlers
+ * Sets up session interface event handlers with optimized debouncing
  */
 function setupSessionHandlers() {
     const promptInput = document.getElementById('messageInput');
     const form = document.getElementById('atlas-form');
 
     if (promptInput) {
-        // ADD: Debounced input handling
-        let adjustHeightTimeout;
+        // Optimized input handling with RAF
+        let adjustHeightFrame;
         promptInput.addEventListener('input', () => {
-            clearTimeout(adjustHeightTimeout);
-            adjustHeightTimeout = setTimeout(adjustTextareaHeight, 10);
+            if (adjustHeightFrame) {
+                cancelAnimationFrame(adjustHeightFrame);
+            }
+            adjustHeightFrame = requestAnimationFrame(adjustTextareaHeight);
         });
         
         promptInput.addEventListener('keydown', (e) => {
@@ -131,20 +131,25 @@ function setupSessionHandlers() {
             }
         });
         
-        // ADD: Character counter
+        // Optimized character counter
+        let characterCountFrame;
         promptInput.addEventListener('input', () => {
-            const length = promptInput.value.length;
-            const maxLength = 4000;
-            if (length > maxLength * 0.9) {
-                // Show warning when approaching limit
-                console.warn(`Approaching character limit: ${length}/${maxLength}`);
+            if (characterCountFrame) {
+                cancelAnimationFrame(characterCountFrame);
             }
+            characterCountFrame = requestAnimationFrame(() => {
+                const length = promptInput.value.length;
+                const maxLength = 4000;
+                if (length > maxLength * 0.9) {
+                    console.warn(`Approaching character limit: ${length}/${maxLength}`);
+                }
+            });
         });
         
         promptInput.focus();
     }
 
-    // ADD: Debounced session switching
+    // Improved session switching with loading feedback
     let sessionSwitchTimeout = null;
     
     function debouncedLoadSession(sessionId) {
@@ -152,14 +157,25 @@ function setupSessionHandlers() {
             clearTimeout(sessionSwitchTimeout);
         }
         
+        // Show immediate feedback
+        const sessionItem = document.querySelector(`[data-session-id="${sessionId}"]`);
+        if (sessionItem) {
+            sessionItem.classList.add('loading');
+        }
+        
         sessionSwitchTimeout = setTimeout(() => {
             loadSession(sessionId);
-        }, 100); // 100ms debounce
+            // Remove loading state after a short delay
+            setTimeout(() => {
+                if (sessionItem) {
+                    sessionItem.classList.remove('loading');
+                }
+            }, 200);
+        }, 50); // Reduced debounce for faster response
     }
 
-    // Setup new session button handler with proper event delegation
+    // Optimized event delegation with passive listeners
     document.addEventListener('click', (e) => {
-        // Handle new session button clicks
         if (e.target.closest('.new-session-btn')) {
             e.preventDefault();
             e.stopPropagation();
@@ -167,7 +183,6 @@ function setupSessionHandlers() {
             return;
         }
         
-        // Handle session item clicks with debouncing
         const sessionItem = e.target.closest('.session-item');
         if (sessionItem) {
             e.preventDefault();
@@ -177,7 +192,7 @@ function setupSessionHandlers() {
                 debouncedLoadSession(sessionId);
             }
         }
-    });
+    }, { passive: false });
 }
 
 // Export legacy names for backward compatibility

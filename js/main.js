@@ -91,14 +91,14 @@ function initializeApp() {
     const sessions = getSessions();
     
     if (!sessionId || sessions.length === 0) {
+        console.log('Creating new session...');
         const newSession = createNewSession();
         sessionId = newSession.id;
+        console.log('New session created:', sessionId);
     }
     
-    // Force render session history
-    setTimeout(() => {
-        renderSessionHistory();
-    }, 200);
+    // Force render session history immediately
+    renderSessionHistory();
     
     // Attach event listeners only once
     if (!eventListenersAttached) {
