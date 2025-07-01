@@ -2,51 +2,58 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATLAS</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="css/style.css">
-    <meta name="google" content="notranslate">
-    <meta http-equiv="Content-Language" content="en">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <div class="app-layout">
-        <div class="sidebar">
+    <div id="app">
+        <aside class="sidebar">
             <div class="sidebar-header">
-                <button class="new-session-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    <span>New Session</span>
+                <button id="new-session-btn" class="new-session-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Nouvelle session
                 </button>
             </div>
-            <nav class="session-history">
-                <!-- Session history will be populated here -->
-            </nav>
-            <div class="sidebar-footer">
-                <!-- User profile / settings can go here -->
+            <div class="sessions-list" id="sessions-list">
+                <!-- Sessions will be populated here -->
             </div>
-        </div>
+        </aside>
+        
         <main class="main-content">
             <div class="session-container">
-                <div class="session-messages" id="session-messages">
-                    <!-- Messages will be added here by JavaScript -->
+                <div class="messages" id="messages">
+                    <div class="welcome-message">
+                        <h2>Bienvenue dans ATLAS</h2>
+                        <p>Votre assistant IA personnel. Posez une question pour commencer.</p>
+                    </div>
                 </div>
-                <div class="session-input-area">
-                    <form id="atlas-form" autocomplete="off">
-                        <div class="messageBox">
-                            <textarea placeholder="Message..." id="messageInput" name="prompt" rows="1"></textarea>
-                            <button id="sendButton" type="submit">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 664 663">
-                                <path fill="none" d="M646.293 331.888L17.7538 17.6187L155.245 331.888M646.293 331.888L17.753 646.157L155.245 331.888M646.293 331.888L318.735 330.228L155.245 331.888"></path>
-                                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="33.67" stroke="#6c6c6c" d="M646.293 331.888L17.7538 17.6187L155.245 331.888M646.293 331.888L17.753 646.157L155.245 331.888M646.293 331.888L318.735 330.228L155.245 331.888"></path>
-                                </svg>
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                
+                <form class="input-form" id="chat-form">
+                    <div class="input-container">
+                        <textarea 
+                            id="message-input" 
+                            placeholder="Tapez votre message..."
+                            rows="1"
+                            maxlength="4000"
+                        ></textarea>
+                        <button type="submit" id="send-btn" disabled>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
             </div>
         </main>
     </div>
+    
     <div id="toast-container"></div>
-    <script type="module" src="js/main.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
