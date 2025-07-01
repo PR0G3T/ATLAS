@@ -4,7 +4,7 @@ import { getSession, isLoggedIn, endSession, isSessionValid, refreshSession, cle
 import { PROMPT_ENDPOINT } from './config.js';
 import { toggleFormState, adjustTextareaHeight, resetPromptInput, showChatInterface, startNewChat } from './ui.js';
 import { createLocalSession } from './auth.js';
-import { createNewConversation, getCurrentConversationId, getConversations } from './conversationHistory.js';
+import { createNewConversation, getCurrentConversationId, getConversations, renderConversationHistory } from './conversationHistory.js';
 
 let isWaiting = false;
 
@@ -143,23 +143,11 @@ function initializeApp() {
             }
         });
         
-        // New chat button handler
-        document.addEventListener('click', (e) => {
-            const newChatBtn = e.target.closest('.new-chat-btn');
-            if (newChatBtn) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('New chat button clicked via delegation');
-                startNewChat();
-            }
-        });
-        
         eventListenersAttached = true;
         console.log('Event listeners attached');
     }
 }
 
-// Remove the duplicate event listeners that were being attached globally
-// Keep only the ones in initializeApp
+// Remove the duplicate new chat button handler that was causing issues
 
 initializeApp();

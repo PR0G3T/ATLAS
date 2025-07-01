@@ -185,29 +185,22 @@ function setupChatHandlers() {
         promptInput.focus();
     }
 
-    // Remove existing handlers to prevent duplicates - IMPROVED
-    const existingNewChatBtns = document.querySelectorAll('.new-chat-btn[data-listener="true"]');
-    existingNewChatBtns.forEach(btn => {
-        btn.replaceWith(btn.cloneNode(true));
-    });
-
-    // Setup new chat button handler - IMPROVED
-    const newChatBtn = document.querySelector('.new-chat-btn');
-    if (newChatBtn && !newChatBtn.dataset.listener) {
-        newChatBtn.dataset.listener = 'true';
-        newChatBtn.addEventListener('click', (e) => {
+    // Setup new chat button handler with proper event delegation
+    document.addEventListener('click', (e) => {
+        // Handle new chat button clicks
+        if (e.target.closest('.new-chat-btn')) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('New chat button clicked');
+            console.log('New chat button clicked via delegation');
             startNewChat();
-        });
-    }
-
-    // Setup conversation item click handlers
-    document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('conversation-item')) {
+            return;
+        }
+        
+        // Handle conversation item clicks
+        const conversationItem = e.target.closest('.conversation-item');
+        if (conversationItem) {
             e.preventDefault();
-            const conversationId = e.target.dataset.conversationId;
+            const conversationId = conversationItem.dataset.conversationId;
             if (conversationId) {
                 console.log('Loading conversation:', conversationId);
                 loadConversation(conversationId);

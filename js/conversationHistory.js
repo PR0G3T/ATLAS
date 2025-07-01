@@ -79,11 +79,13 @@ export function createNewConversation() {
     saveConversations(conversations);
     setCurrentConversation(conversationId);
     
-    // Force immediate render
-    renderConversationHistory();
-    
     console.log('New conversation created and set as current:', conversationId);
     console.log('Total conversations:', conversations.length);
+    
+    // Force immediate render with a small delay to ensure DOM is ready
+    setTimeout(() => {
+        renderConversationHistory();
+    }, 50);
     
     return conversation;
 }
