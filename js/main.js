@@ -1,6 +1,6 @@
 /**
  * ATLAS - AI Assistant
- * Application principale
+ * Main Application
  */
 
 class Atlas {
@@ -17,7 +17,7 @@ class Atlas {
         this.setupEventListeners();
         this.renderSessions();
         
-        // Créer une session par défaut si aucune n'existe
+        // Create default session if none exists
         if (this.sessions.length === 0) {
             this.createNewSession();
         } else if (this.currentSessionId) {
@@ -28,25 +28,25 @@ class Atlas {
     }
     
     setupEventListeners() {
-        // Nouvelle session
+        // New session
         document.getElementById('new-session-btn').addEventListener('click', () => {
             this.createNewSession();
         });
         
-        // Envoi de message
+        // Send message
         document.getElementById('chat-form').addEventListener('submit', (e) => {
             e.preventDefault();
             this.sendMessage();
         });
         
-        // Auto-resize du textarea
+        // Auto-resize textarea
         const input = document.getElementById('message-input');
         input.addEventListener('input', () => {
             this.autoResizeTextarea(input);
             this.updateSendButton();
         });
         
-        // Envoi avec Ctrl+Entrée
+        // Send with Ctrl+Enter
         input.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 'Enter') {
                 e.preventDefault();
@@ -55,7 +55,7 @@ class Atlas {
         });
     }
     
-    // Gestion des sessions
+    // Session management
     loadSessions() {
         try {
             const sessions = localStorage.getItem('atlas_sessions');
@@ -69,7 +69,7 @@ class Atlas {
         try {
             localStorage.setItem('atlas_sessions', JSON.stringify(this.sessions));
         } catch (error) {
-            this.showToast('Erreur lors de la sauvegarde', 'error');
+            this.showToast('Error saving sessions', 'error');
         }
     }
     
@@ -85,7 +85,7 @@ class Atlas {
     createNewSession() {
         const session = {
             id: Date.now().toString(),
-            title: 'Nouvelle conversation',
+            title: 'New conversation',
             messages: [],
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
@@ -97,7 +97,7 @@ class Atlas {
         this.renderSessions();
         this.clearMessages();
         this.focusInput();
-        this.showToast('Nouvelle session créée');
+        this.showToast('New session created');
     }
     
     loadSession(sessionId) {
@@ -139,7 +139,7 @@ class Atlas {
         session.messages.push(message);
         session.updatedAt = new Date().toISOString();
         
-        // Mettre à jour le titre si c'est le premier message utilisateur
+        // Update title if this is the first user message
         if (role === 'user' && session.messages.filter(m => m.role === 'user').length === 1) {
             const title = content.length > 30 ? content.substring(0, 30) + '...' : content;
             this.updateSessionTitle(session.id, title);
@@ -148,11 +148,11 @@ class Atlas {
         this.saveSessions();
     }
     
-    // Interface utilisateur
+    // User interface
     renderSessions() {
         const container = document.getElementById('sessions-list');
         if (this.sessions.length === 0) {
-            container.innerHTML = '<div class="no-sessions">Aucune conversation</div>';
+            container.innerHTML = '<div class="no-sessions">No conversations</div>';
             return;
         }
         
@@ -173,7 +173,7 @@ class Atlas {
     addMessageToUI(content, role, saveToSession = true) {
         const container = document.getElementById('messages');
         
-        // Supprimer le message de bienvenue
+        // Remove welcome message
         const welcome = container.querySelector('.welcome-message');
         if (welcome) welcome.remove();
         
@@ -182,7 +182,22 @@ class Atlas {
         
         const avatar = document.createElement('div');
         avatar.className = 'message-avatar';
-        avatar.innerHTML = role === 'user' ? '👤' : '🤖';
+        
+        if (role === 'user') {
+            avatar.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+            `;
+        } else {
+            // Use ATLAS favicon SVG for AI messages
+            avatar.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.36 2.64c1.64 0 3 1.36 3 3c0 1.65-1.36 3-3 3c-1.65 0-3-1.35-3-3c0-.3.05-.58.14-.84c-1.07-.51-2.25-.8-3.5-.8a8 8 0 0 0-8 8l.04.84l-1.99.21L2 12A10 10 0 0 1 12 2c1.69 0 3.28.42 4.67 1.16c.49-.33 1.07-.52 1.69-.52m0 2a1 1 0 0 0-1 1a1 1 0 0 0 1 1c.56 0 1-.45 1-1c0-.56-.44-1-1-1M5.64 15.36c1.65 0 3 1.35 3 3c0 .3-.05.58-.14.84c1.07.51 2.25.8 3.5.8a8 8 0 0 0 8-8l-.04-.84l1.99-.21L22 12a10 10 0 0 1-10 10c-1.69 0-3.28-.42-4.67-1.16c-.49.33-1.07.52-1.69.52c-1.64 0-3-1.36-3-3c0-1.65 1.36-3 3-3m0 2c-.56 0-1 .45-1 1c0 .56.44 1 1 1a1 1 0 0 0 1-1a1 1 0 0 0-1-1M12 8a4 4 0 0 1 4 4a4 4 0 0 1-4 4a4 4 0 0 1-4-4a4 4 0 0 1 4-4"/>
+                </svg>
+            `;
+        }
         
         const contentDiv = document.createElement('div');
         contentDiv.className = 'message-content';
@@ -192,7 +207,7 @@ class Atlas {
         messageDiv.appendChild(contentDiv);
         container.appendChild(messageDiv);
         
-        // Scroll vers le bas
+        // Scroll to bottom
         container.scrollTop = container.scrollHeight;
         
         if (saveToSession) {
@@ -208,17 +223,17 @@ class Atlas {
         
         if (!content) return;
         if (content.length > 4000) {
-            this.showToast('Message trop long (max 4000 caractères)', 'error');
+            this.showToast('Message too long (max 4000 characters)', 'error');
             return;
         }
         
-        // Ajouter le message utilisateur
+        // Add user message
         this.addMessageToUI(content, 'user');
         input.value = '';
         this.autoResizeTextarea(input);
         this.updateSendButton();
         
-        // État de chargement
+        // Loading state
         this.setLoading(true);
         const loadingMessage = this.addLoadingMessage();
         
@@ -232,25 +247,25 @@ class Atlas {
             });
             
             if (!response.ok) {
-                throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
             }
             
             const data = await response.json();
             
-            // Supprimer le message de chargement
+            // Remove loading message
             loadingMessage.remove();
             
-            // Ajouter la réponse
+            // Add response
             if (data.response) {
                 this.addMessageToUI(data.response, 'ai');
             } else {
-                throw new Error('Réponse invalide du serveur');
+                throw new Error('Invalid server response');
             }
             
         } catch (error) {
-            console.error('Erreur:', error);
+            console.error('Error:', error);
             loadingMessage.remove();
-            this.showToast(`Erreur: ${error.message}`, 'error');
+            this.showToast(`Error: ${error.message}`, 'error');
         } finally {
             this.setLoading(false);
             this.focusInput();
@@ -265,11 +280,15 @@ class Atlas {
         
         const avatar = document.createElement('div');
         avatar.className = 'message-avatar';
-        avatar.innerHTML = '🤖';
+        avatar.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.36 2.64c1.64 0 3 1.36 3 3c0 1.65-1.36 3-3 3c-1.65 0-3-1.35-3-3c0-.3.05-.58.14-.84c-1.07-.51-2.25-.8-3.5-.8a8 8 0 0 0-8 8l.04.84l-1.99.21L2 12A10 10 0 0 1 12 2c1.69 0 3.28.42 4.67 1.16c.49-.33 1.07-.52 1.69-.52m0 2a1 1 0 0 0-1 1a1 1 0 0 0 1 1c.56 0 1-.45 1-1c0-.56-.44-1-1-1M5.64 15.36c1.65 0 3 1.35 3 3c0 .3-.05.58-.14.84c1.07.51 2.25.8 3.5.8a8 8 0 0 0 8-8l-.04-.84l1.99-.21L22 12a10 10 0 0 1-10 10c-1.69 0-3.28-.42-4.67-1.16c-.49.33-1.07.52-1.69.52c-1.64 0-3-1.36-3-3c0-1.65 1.36-3 3-3m0 2c-.56 0-1 .45-1 1c0 .56.44 1 1 1a1 1 0 0 0 1-1a1 1 0 0 0-1-1M12 8a4 4 0 0 1 4 4a4 4 0 0 1-4 4a4 4 0 0 1-4-4a4 4 0 0 1 4-4"/>
+            </svg>
+        `;
         
         const contentDiv = document.createElement('div');
         contentDiv.className = 'message-content';
-        contentDiv.textContent = 'En cours de réflexion...';
+        contentDiv.textContent = 'Thinking...';
         
         messageDiv.appendChild(avatar);
         messageDiv.appendChild(contentDiv);
@@ -306,7 +325,7 @@ class Atlas {
         }
     }
     
-    // Utilitaires
+    // Utilities
     autoResizeTextarea(textarea) {
         textarea.style.height = 'auto';
         textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px';
@@ -352,8 +371,8 @@ class Atlas {
     }
 }
 
-// Initialiser l'application
+// Initialize application
 const atlas = new Atlas();
 
-// Exposer globalement pour les événements inline
+// Expose globally for inline events
 window.atlas = atlas;
