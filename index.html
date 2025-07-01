@@ -6,36 +6,61 @@
     <link rel="stylesheet" href="css/style.css">
     <meta name="google" content="notranslate">
     <meta http-equiv="Content-Language" content="en">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-messages" id="chat-messages">
-            <!-- Messages will be added here by JavaScript -->
+    <div class="app-layout">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <button class="new-chat-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>New Chat</span>
+                </button>
+            </div>
+            <nav class="conversation-history">
+                <!-- Conversation history will be populated here -->
+                <a href="#" class="conversation-item active">
+                    <span class="conversation-title">Introduction to Quantum Physics</span>
+                </a>
+                <a href="#" class="conversation-item">
+                    <span class="conversation-title">Recipe for a perfect pizza</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <!-- User profile / settings can go here -->
+            </div>
         </div>
-        <div class="chat-input-area">
-            <form id="atlas-form" autocomplete="off">
-                <div class="messageBox">
-                    <div class="fileUploadWrapper">
-                        <label for="file">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 337 337">
-                                <circle stroke-width="20" stroke="#6c6c6c" fill="none" r="158.5" cy="168.5" cx="168.5"></circle>
-                                <path stroke-linecap="round" stroke-width="25" stroke="#6c6c6c" d="M167.759 79V259"></path>
-                                <path stroke-linecap="round" stroke-width="25" stroke="#6c6c6c" d="M79 167.138H259"></path>
-                            </svg>
-                            <span class="tooltip">Add an image</span>
-                        </label>
-                        <input type="file" id="file" name="file" />
-                    </div>
-                    <textarea placeholder="Message..." id="messageInput" name="prompt" rows="1"></textarea>
-                    <button id="sendButton" type="submit">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 664 663">
-                        <path fill="none" d="M646.293 331.888L17.7538 17.6187L155.245 331.888M646.293 331.888L17.753 646.157L155.245 331.888M646.293 331.888L318.735 330.228L155.245 331.888"></path>
-                        <path stroke-linejoin="round" stroke-linecap="round" stroke-width="33.67" stroke="#6c6c6c" d="M646.293 331.888L17.7538 17.6187L155.245 331.888M646.293 331.888L17.753 646.157L155.245 331.888M646.293 331.888L318.735 330.228L155.245 331.888"></path>
-                        </svg>
-                    </button>
+        <main class="main-content">
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Messages will be added here by JavaScript -->
                 </div>
-            </form>
-        </div>
+                <div class="chat-input-area">
+                    <form id="atlas-form" autocomplete="off">
+                        <div class="messageBox">
+                            <div class="fileUploadWrapper">
+                                <label for="file">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 337 337">
+                                        <circle stroke-width="20" stroke="#6c6c6c" fill="none" r="158.5" cy="168.5" cx="168.5"></circle>
+                                        <path stroke-linecap="round" stroke-width="25" stroke="#6c6c6c" d="M167.759 79V259"></path>
+                                        <path stroke-linecap="round" stroke-width="25" stroke="#6c6c6c" d="M79 167.138H259"></path>
+                                    </svg>
+                                    <span class="tooltip">Add an image</span>
+                                </label>
+                                <input type="file" id="file" name="file" />
+                            </div>
+                            <textarea placeholder="Message..." id="messageInput" name="prompt" rows="1"></textarea>
+                            <button id="sendButton" type="submit">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 664 663">
+                                <path fill="none" d="M646.293 331.888L17.7538 17.6187L155.245 331.888M646.293 331.888L17.753 646.157L155.245 331.888M646.293 331.888L318.735 330.228L155.245 331.888"></path>
+                                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="33.67" stroke="#6c6c6c" d="M646.293 331.888L17.7538 17.6187L155.245 331.888M646.293 331.888L17.753 646.157L155.245 331.888M646.293 331.888L318.735 330.228L155.245 331.888"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
     </div>
     <div id="toast-container"></div>
     <script type="module" src="js/main.js"></script>
