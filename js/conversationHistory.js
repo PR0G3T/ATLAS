@@ -353,14 +353,3 @@ export function deleteSession(sessionId) {
     
     renderSessionHistory();
 }
-
-// Export legacy names for backward compatibility
-export const getConversations = getSessions;
-export const createNewConversation = createNewSession;
-export const updateConversation = updateSession;
-export const getCurrentConversationId = getCurrentSessionId;
-export const setCurrentConversation = setCurrentSession;
-export const getCurrentConversation = getCurrentSession;
-export const loadConversation = loadSession;
-export const renderConversationHistory = renderSessionHistory;
-export const deleteConversation = deleteSession;

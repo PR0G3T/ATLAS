@@ -26,11 +26,11 @@ async function handlePromptSubmit(e) {
     // ADD: Sanitize input to prevent XSS
     const sanitizedPrompt = prompt.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
 
-    // Ensure we have a conversation to save messages to
-    let conversationId = getCurrentSessionId();
-    if (!conversationId) {
-        const conversation = createNewSession();
-        conversationId = conversation.id;
+    // Ensure we have a session to save messages to
+    let sessionId = getCurrentSessionId();
+    if (!sessionId) {
+        const session = createNewSession();
+        sessionId = session.id;
     }
 
     isWaiting = true;
