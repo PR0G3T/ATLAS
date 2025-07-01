@@ -1,6 +1,6 @@
 #toast-container {
     position: fixed;
-    bottom: 80px;
+    bottom: 32px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 9999;
@@ -12,8 +12,8 @@
 }
 
 .toast {
-    background: var(--form-bg);
-    color: var(--text-color);
+    background: var(--form-input-bg);
+    color: var(--form-input-color);
     padding: 16px 28px;
     border-radius: var(--form-radius);
     box-shadow: 0 2px 12px rgba(0,0,0,0.18);
