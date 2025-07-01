@@ -76,9 +76,13 @@ document.addEventListener('submit', (e) => {
     }
 });
 
-// Add global event delegation for new chat button
+// Add global event delegation for new chat button with better targeting
 document.addEventListener('click', (e) => {
-    if (e.target.closest('.new-chat-btn')) {
+    // Check if clicked element or its parent is the new chat button
+    const newChatBtn = e.target.closest('.new-chat-btn');
+    if (newChatBtn) {
+        e.preventDefault();
+        e.stopPropagation();
         startNewChat();
     }
 });

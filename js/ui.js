@@ -66,12 +66,36 @@ export function showChatInterface() {
 }
 
 /**
+ * Starts a new chat by clearing messages
+ */
+export function startNewChat() {
+    // End current session and start fresh
+    endSession();
+    
+    const chatMessages = document.getElementById('chat-messages');
+    if (chatMessages) {
+        chatMessages.innerHTML = '';
+    }
+    
+    const promptInput = document.getElementById('messageInput');
+    if (promptInput) {
+        promptInput.value = '';
+        adjustTextareaHeight();
+        promptInput.focus();
+    }
+    
+    // Create new session for the new chat
+    import('./auth.js').then(({ createLocalSession }) => {
+        createLocalSession();
+    });
+}
+
+/**
  * Sets up chat interface event handlers
  */
 function setupChatHandlers() {
     const promptInput = document.getElementById('messageInput');
     const form = document.getElementById('atlas-form');
-    const newChatBtn = document.querySelector('.new-chat-btn');
 
     if (promptInput) {
         promptInput.addEventListener('input', adjustTextareaHeight);
@@ -84,24 +108,15 @@ function setupChatHandlers() {
                 }
             }
         });
-    }
-
-    if (newChatBtn) {
-        newChatBtn.addEventListener('click', startNewChat);
-    }
-}
-
-/**
- * Starts a new chat by clearing messages
- */
-export function startNewChat() {
-    const chatMessages = document.getElementById('chat-messages');
-    if (chatMessages) {
-        chatMessages.innerHTML = '';
-    }
-    
-    const promptInput = document.getElementById('messageInput');
-    if (promptInput) {
+        // Focus the input when chat interface is shown
         promptInput.focus();
+    }
+
+    // Setup new chat button handler
+    const newChatBtn = document.querySelector('.new-chat-btn');
+    if (newChatBtn) {
+        // Remove existing listeners to prevent duplicates
+        newChatBtn.removeEventListener('click', startNewChat);
+        newChatBtn.addEventListener('click', startNewChat);
     }
 }
