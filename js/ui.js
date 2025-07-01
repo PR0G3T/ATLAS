@@ -1,4 +1,3 @@
-import { endSession } from './session.js';
 import { createNewConversation, renderConversationHistory, loadConversation } from './conversationHistory.js';
 
 const promptInput = document.getElementById('messageInput');
@@ -87,10 +86,7 @@ export function showChatInterface() {
  * Starts a new chat by clearing messages
  */
 export function startNewChat() {
-    // End current session and start fresh
-    endSession();
-    
-    // Create new conversation FIRST
+    // Create new conversation
     const conversation = createNewConversation();
     
     const chatMessages = document.getElementById('chat-messages');
@@ -105,14 +101,10 @@ export function startNewChat() {
         promptInput.focus();
     }
     
-    // Create new session for the new chat
-    import('./auth.js').then(({ createLocalSession }) => {
-        createLocalSession();
-        // Force render conversation history after session is created
-        setTimeout(() => {
-            renderConversationHistory();
-        }, 100);
-    });
+    // Force render conversation history
+    setTimeout(() => {
+        renderConversationHistory();
+    }, 100);
 }
 
 /**

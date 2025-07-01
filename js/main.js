@@ -1,9 +1,7 @@
 import { addMessage } from './addMessage.js';
 import { showToast } from './showToast.js';
-import { getSession, isLoggedIn, endSession, isSessionValid, refreshSession, clearExampleSessions } from './session.js';
 import { PROMPT_ENDPOINT } from './config.js';
 import { toggleFormState, adjustTextareaHeight, resetPromptInput, showChatInterface, startNewChat } from './ui.js';
-import { createLocalSession } from './auth.js';
 import { createNewConversation, getCurrentConversationId, getConversations, renderConversationHistory } from './conversationHistory.js';
 
 let isWaiting = false;
@@ -28,17 +26,6 @@ async function handlePromptSubmit(e) {
     // ADD: Sanitize input to prevent XSS
     const sanitizedPrompt = prompt.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
 
-    const session = getSession();
-    if (!session || !isSessionValid()) {
-        // Create new local session if none exists
-        createLocalSession();
-        const newSession = getSession();
-        if (!newSession) {
-            showToast('Failed to create session.', 'error');
-            return;
-        }
-    }
-
     // Ensure we have a conversation to save messages to
     let conversationId = getCurrentConversationId();
     if (!conversationId) {
@@ -48,7 +35,7 @@ async function handlePromptSubmit(e) {
 
     isWaiting = true;
     toggleFormState(true);
-    addMessage(sanitizedPrompt, 'user'); // Use sanitized input
+    addMessage(sanitizedPrompt, 'user');
     resetPromptInput();
 
     // ADD: Request timeout and abort controller
@@ -56,12 +43,10 @@ async function handlePromptSubmit(e) {
     const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
     try {
-        const currentSession = getSession();
         const response = await fetch(PROMPT_ENDPOINT, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${currentSession.token}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({ prompt: sanitizedPrompt }),
             signal: controller.signal
@@ -81,7 +66,6 @@ async function handlePromptSubmit(e) {
         }
         
         addMessage(data.response || 'No response.', 'ai');
-        refreshSession();
     } catch (err) {
         if (err.name === 'AbortError') {
             showToast('Request timed out. Please try again.', 'error');
@@ -96,19 +80,11 @@ async function handlePromptSubmit(e) {
     }
 }
 
-// Remove duplicate event listener setup
 let eventListenersAttached = false;
 
 function initializeApp() {
-    // Clear any example sessions first
-    clearExampleSessions();
-    
-    // Always show chat interface, create session if needed
-    if (!isLoggedIn() || !isSessionValid()) {
-        createLocalSession();
-    } else {
-        showChatInterface();
-    }
+    // Always show chat interface
+    showChatInterface();
     
     // Create initial conversation if none exists OR if no current conversation is set
     let conversationId = getCurrentConversationId();
@@ -136,7 +112,5 @@ function initializeApp() {
         eventListenersAttached = true;
     }
 }
-
-// Remove the duplicate new chat button handler that was causing issues
 
 initializeApp();

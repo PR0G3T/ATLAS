@@ -1,40 +1,21 @@
-import { startSession } from './session.js';
 import { showToast } from './showToast.js';
 import { showChatInterface } from './ui.js';
 
 /**
- * Secure token generation
+ * Shows the chat interface without requiring authentication
  */
-function generateSecureToken() {
-    const array = new Uint8Array(32);
-    crypto.getRandomValues(array);
-    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
-}
-
-/**
- * Creates a local session for the app
- */
-export function createLocalSession() {
-    const sessionData = {
-        token: generateSecureToken(),
-        username: 'local_user',
-        userId: 'local_' + generateSecureToken().substring(0, 16),
-        createdAt: Date.now(),
-        lastActivity: Date.now()
-    };
-    
+export function initializeApp() {
     try {
-        startSession(sessionData);
-        showToast('Session initialized!', 'success');
+        showToast('Welcome to ATLAS!', 'success');
         showChatInterface();
     } catch (error) {
-        console.error('Failed to create session:', error);
-        showToast('Failed to initialize session', 'error');
+        console.error('Failed to initialize app:', error);
+        showToast('Failed to initialize application', 'error');
     }
 }
 
 /**
- * Real authentication methods
+ * Real authentication methods (placeholder for future implementation)
  */
 export async function authenticateUser(credentials) {
     throw new Error('Real authentication not implemented');
@@ -42,8 +23,12 @@ export async function authenticateUser(credentials) {
 
 export function logout() {
     try {
-        endSession();
-        showToast('Logged out successfully', 'success');
+        showToast('Goodbye!', 'success');
+        // Clear conversation history if needed
+        localStorage.removeItem('atlas_conversations');
+        localStorage.removeItem('atlas_current_conversation');
+        // Reload the page to reset state
+        window.location.reload();
     } catch (error) {
         console.error('Logout error:', error);
     }
