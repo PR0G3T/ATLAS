@@ -1,8 +1,8 @@
 import { addMessage } from './addMessage.js';
 import { showToast } from './showToast.js';
 import { PROMPT_ENDPOINT } from './config.js';
-import { toggleFormState, adjustTextareaHeight, resetPromptInput, showChatInterface, startNewChat } from './ui.js';
-import { createNewConversation, getCurrentConversationId, getConversations, renderConversationHistory } from './conversationHistory.js';
+import { toggleFormState, adjustTextareaHeight, resetPromptInput, showSessionInterface, startNewSession } from './ui.js';
+import { createNewSession, getCurrentSessionId, getSessions, renderSessionHistory } from './conversationHistory.js';
 
 let isWaiting = false;
 
@@ -17,7 +17,7 @@ async function handlePromptSubmit(e) {
     if (!promptInput) return;
     
     const prompt = promptInput.value.trim();
-    // ADD: Input validation and sanitization
+    // 
     if (!prompt || prompt.length > 4000) {
         showToast('Please enter a valid question (max 4000 characters).', 'error');
         return;
@@ -27,9 +27,9 @@ async function handlePromptSubmit(e) {
     const sanitizedPrompt = prompt.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
 
     // Ensure we have a conversation to save messages to
-    let conversationId = getCurrentConversationId();
+    let conversationId = getCurrentSessionId();
     if (!conversationId) {
-        const conversation = createNewConversation();
+        const conversation = createNewSession();
         conversationId = conversation.id;
     }
 
@@ -83,21 +83,21 @@ async function handlePromptSubmit(e) {
 let eventListenersAttached = false;
 
 function initializeApp() {
-    // Always show chat interface
-    showChatInterface();
+    // Always show session interface
+    showSessionInterface();
     
-    // Create initial conversation if none exists OR if no current conversation is set
-    let conversationId = getCurrentConversationId();
-    const conversations = getConversations();
+    // Create initial session if none exists OR if no current session is set
+    let sessionId = getCurrentSessionId();
+    const sessions = getSessions();
     
-    if (!conversationId || conversations.length === 0) {
-        const newConversation = createNewConversation();
-        conversationId = newConversation.id;
+    if (!sessionId || sessions.length === 0) {
+        const newSession = createNewSession();
+        sessionId = newSession.id;
     }
     
-    // Force render conversation history
+    // Force render session history
     setTimeout(() => {
-        renderConversationHistory();
+        renderSessionHistory();
     }, 200);
     
     // Attach event listeners only once

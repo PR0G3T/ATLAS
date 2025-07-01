@@ -1,9 +1,9 @@
-import { updateConversation, getCurrentConversationId } from './conversationHistory.js';
+import { updateSession, getCurrentSessionId } from './conversationHistory.js';
 
 export function addMessage(text, sender = 'user', saveToHistory = true) {
-    const chatMessages = document.getElementById('chat-messages');
-    if (!chatMessages) {
-        console.warn('chat-messages element not found');
+    const sessionMessages = document.getElementById('session-messages');
+    if (!sessionMessages) {
+        console.warn('session-messages element not found');
         return;
     }
 
@@ -31,23 +31,23 @@ export function addMessage(text, sender = 'user', saveToHistory = true) {
     messageElement.appendChild(avatarElement);
     messageElement.appendChild(bubbleElement);
     
-    chatMessages.appendChild(messageElement);
+    sessionMessages.appendChild(messageElement);
 
     // Smooth scroll to bottom
     requestAnimationFrame(() => {
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        sessionMessages.scrollTop = sessionMessages.scrollHeight;
     });
 
-    // Save message to conversation history only when requested
+    // Save message to session history only when requested
     if (saveToHistory) {
-        const conversationId = getCurrentConversationId();
-        if (conversationId) {
+        const sessionId = getCurrentSessionId();
+        if (sessionId) {
             const message = {
                 text,
                 sender,
                 timestamp: Date.now()
             };
-            updateConversation(conversationId, message);
+            updateSession(sessionId, message);
         }
     }
 }

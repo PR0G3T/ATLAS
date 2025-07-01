@@ -13,24 +13,24 @@
     <div class="app-layout">
         <div class="sidebar">
             <div class="sidebar-header">
-                <button class="new-chat-btn">
+                <button class="new-session-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    <span>New Chat</span>
+                    <span>New Session</span>
                 </button>
             </div>
-            <nav class="conversation-history">
-                <!-- Conversation history will be populated here -->
+            <nav class="session-history">
+                <!-- Session history will be populated here -->
             </nav>
             <div class="sidebar-footer">
                 <!-- User profile / settings can go here -->
             </div>
         </div>
         <main class="main-content">
-            <div class="chat-container">
-                <div class="chat-messages" id="chat-messages">
+            <div class="session-container">
+                <div class="session-messages" id="session-messages">
                     <!-- Messages will be added here by JavaScript -->
                 </div>
-                <div class="chat-input-area">
+                <div class="session-input-area">
                     <form id="atlas-form" autocomplete="off">
                         <div class="messageBox">
                             <textarea placeholder="Message..." id="messageInput" name="prompt" rows="1"></textarea>

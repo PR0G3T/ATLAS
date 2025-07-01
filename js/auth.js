@@ -1,13 +1,13 @@
 import { showToast } from './showToast.js';
-import { showChatInterface } from './ui.js';
+import { showSessionInterface } from './ui.js';
 
 /**
- * Shows the chat interface without requiring authentication
+ * Shows the session interface without requiring authentication
  */
 export function initializeApp() {
     try {
         showToast('Welcome to ATLAS!', 'success');
-        showChatInterface();
+        showSessionInterface();
     } catch (error) {
         console.error('Failed to initialize app:', error);
         showToast('Failed to initialize application', 'error');
@@ -24,9 +24,9 @@ export async function authenticateUser(credentials) {
 export function logout() {
     try {
         showToast('Goodbye!', 'success');
-        // Clear conversation history if needed
-        localStorage.removeItem('atlas_conversations');
-        localStorage.removeItem('atlas_current_conversation');
+        // Clear session history if needed
+        localStorage.removeItem('atlas_sessions');
+        localStorage.removeItem('atlas_current_session');
         // Reload the page to reset state
         window.location.reload();
     } catch (error) {

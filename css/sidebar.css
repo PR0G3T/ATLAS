@@ -15,7 +15,7 @@
     margin-bottom: 1rem;
 }
 
-.new-chat-btn {
+.new-session-btn {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -31,17 +31,17 @@
     transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
-.new-chat-btn:hover {
+.new-session-btn:hover {
     background-color: var(--background-secondary);
     border-color: var(--text-primary);
 }
 
-.new-chat-btn svg {
+.new-session-btn svg {
     width: 20px;
     height: 20px;
 }
 
-.conversation-history {
+.session-history {
     flex-grow: 1;
     overflow-y: auto;
     display: flex;
@@ -50,7 +50,7 @@
     padding: 4px 0;
 }
 
-.no-conversations {
+.no-sessions {
     padding: 20px 12px;
     text-align: center;
     color: var(--text-secondary);
@@ -58,7 +58,7 @@
     font-style: italic;
 }
 
-.conversation-item {
+.session-item {
     display: block;
     padding: 12px;
     border-radius: var(--form-btn-radius);
@@ -73,13 +73,13 @@
     border: 1px solid transparent;
 }
 
-.conversation-item:hover {
+.session-item:hover {
     background-color: var(--background-secondary);
     color: var(--text-primary);
     border-color: var(--border-color);
 }
 
-.conversation-item.active {
+.session-item.active {
     background-color: var(--sidebar-item-active);
     color: var(--text-primary);
     font-weight: 500;

@@ -1,4 +1,4 @@
-#chat-messages {
+#session-messages {
     flex-grow: 1;
     overflow-y: auto;
     padding: 24px;
@@ -16,15 +16,15 @@
 }
 
 /* Custom scrollbar for webkit browsers */
-#chat-messages::-webkit-scrollbar {
+#session-messages::-webkit-scrollbar {
     width: 8px;
 }
 
-#chat-messages::-webkit-scrollbar-track {
+#session-messages::-webkit-scrollbar-track {
     background: var(--background-secondary);
 }
 
-#chat-messages::-webkit-scrollbar-thumb {
+#session-messages::-webkit-scrollbar-thumb {
     background: var(--text-secondary);
     border-radius: 4px;
 }
@@ -102,7 +102,7 @@
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-    #chat-messages {
+    #session-messages {
         scroll-behavior: auto;
     }
 }

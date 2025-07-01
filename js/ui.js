@@ -1,4 +1,4 @@
-import { createNewConversation, renderConversationHistory, loadConversation } from './conversationHistory.js';
+import { createNewSession, renderSessionHistory, loadSession } from './conversationHistory.js';
 
 const promptInput = document.getElementById('messageInput');
 const sendButton = document.getElementById('sendButton');
@@ -23,26 +23,26 @@ export function resetPromptInput() {
 }
 
 /**
- * Shows the chat interface
+ * Shows the session interface
  */
-export function showChatInterface() {
+export function showSessionInterface() {
     const mainContent = document.querySelector('.main-content');
     if (!mainContent) return;
 
     // FIX: Use safer DOM creation instead of innerHTML
-    const chatContainer = document.createElement('div');
-    chatContainer.className = 'chat-container';
+    const sessionContainer = document.createElement('div');
+    sessionContainer.className = 'session-container';
     
-    const chatMessages = document.createElement('div');
-    chatMessages.className = 'chat-messages';
-    chatMessages.id = 'chat-messages';
+    const sessionMessages = document.createElement('div');
+    sessionMessages.className = 'session-messages';
+    sessionMessages.id = 'session-messages';
     // ADD: Accessibility attributes
-    chatMessages.setAttribute('role', 'log');
-    chatMessages.setAttribute('aria-live', 'polite');
-    chatMessages.setAttribute('aria-label', 'Chat messages');
+    sessionMessages.setAttribute('role', 'log');
+    sessionMessages.setAttribute('aria-live', 'polite');
+    sessionMessages.setAttribute('aria-label', 'Session messages');
     
-    const chatInputArea = document.createElement('div');
-    chatInputArea.className = 'chat-input-area';
+    const sessionInputArea = document.createElement('div');
+    sessionInputArea.className = 'session-input-area';
     
     const form = document.createElement('form');
     form.id = 'atlas-form';
@@ -69,29 +69,29 @@ export function showChatInterface() {
     messageBox.appendChild(sendButton);
     
     form.appendChild(messageBox);
-    chatInputArea.appendChild(form);
+    sessionInputArea.appendChild(form);
     
-    chatContainer.appendChild(chatMessages);
-    chatContainer.appendChild(chatInputArea);
+    sessionContainer.appendChild(sessionMessages);
+    sessionContainer.appendChild(sessionInputArea);
     
     // Clear and append
     mainContent.innerHTML = '';
-    mainContent.appendChild(chatContainer);
+    mainContent.appendChild(sessionContainer);
 
-    setupChatHandlers();
-    renderConversationHistory();
+    setupSessionHandlers();
+    renderSessionHistory();
 }
 
 /**
- * Starts a new chat by clearing messages
+ * Starts a new session by clearing messages
  */
-export function startNewChat() {
-    // Create new conversation
-    const conversation = createNewConversation();
+export function startNewSession() {
+    // Create new session
+    const session = createNewSession();
     
-    const chatMessages = document.getElementById('chat-messages');
-    if (chatMessages) {
-        chatMessages.innerHTML = '';
+    const sessionMessages = document.getElementById('session-messages');
+    if (sessionMessages) {
+        sessionMessages.innerHTML = '';
     }
     
     const promptInput = document.getElementById('messageInput');
@@ -101,16 +101,16 @@ export function startNewChat() {
         promptInput.focus();
     }
     
-    // Force render conversation history
+    // Force render session history
     setTimeout(() => {
-        renderConversationHistory();
+        renderSessionHistory();
     }, 100);
 }
 
 /**
- * Sets up chat interface event handlers
+ * Sets up session interface event handlers
  */
-function setupChatHandlers() {
+function setupSessionHandlers() {
     const promptInput = document.getElementById('messageInput');
     const form = document.getElementById('atlas-form');
 
@@ -144,38 +144,42 @@ function setupChatHandlers() {
         promptInput.focus();
     }
 
-    // ADD: Debounced conversation switching
-    let conversationSwitchTimeout = null;
+    // ADD: Debounced session switching
+    let sessionSwitchTimeout = null;
     
-    function debouncedLoadConversation(conversationId) {
-        if (conversationSwitchTimeout) {
-            clearTimeout(conversationSwitchTimeout);
+    function debouncedLoadSession(sessionId) {
+        if (sessionSwitchTimeout) {
+            clearTimeout(sessionSwitchTimeout);
         }
         
-        conversationSwitchTimeout = setTimeout(() => {
-            loadConversation(conversationId);
+        sessionSwitchTimeout = setTimeout(() => {
+            loadSession(sessionId);
         }, 100); // 100ms debounce
     }
 
-    // Setup new chat button handler with proper event delegation
+    // Setup new session button handler with proper event delegation
     document.addEventListener('click', (e) => {
-        // Handle new chat button clicks
-        if (e.target.closest('.new-chat-btn')) {
+        // Handle new session button clicks
+        if (e.target.closest('.new-session-btn')) {
             e.preventDefault();
             e.stopPropagation();
-            startNewChat();
+            startNewSession();
             return;
         }
         
-        // Handle conversation item clicks with debouncing
-        const conversationItem = e.target.closest('.conversation-item');
-        if (conversationItem) {
+        // Handle session item clicks with debouncing
+        const sessionItem = e.target.closest('.session-item');
+        if (sessionItem) {
             e.preventDefault();
             e.stopPropagation();
-            const conversationId = conversationItem.dataset.conversationId;
-            if (conversationId) {
-                debouncedLoadConversation(conversationId);
+            const sessionId = sessionItem.dataset.sessionId;
+            if (sessionId) {
+                debouncedLoadSession(sessionId);
             }
         }
     });
 }
+
+// Export legacy names for backward compatibility
+export const showChatInterface = showSessionInterface;
+export const startNewChat = startNewSession;
