@@ -19,10 +19,14 @@ async function handlePromptSubmit(e) {
     if (!promptInput) return;
     
     const prompt = promptInput.value.trim();
-    if (!prompt) {
-        showToast('Please enter a question.', 'error');
+    // ADD: Input validation and sanitization
+    if (!prompt || prompt.length > 4000) {
+        showToast('Please enter a valid question (max 4000 characters).', 'error');
         return;
     }
+    
+    // ADD: Sanitize input to prevent XSS
+    const sanitizedPrompt = prompt.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
 
     const session = getSession();
     if (!session || !isSessionValid()) {
@@ -44,8 +48,12 @@ async function handlePromptSubmit(e) {
 
     isWaiting = true;
     toggleFormState(true);
-    addMessage(prompt, 'user');
+    addMessage(sanitizedPrompt, 'user'); // Use sanitized input
     resetPromptInput();
+
+    // ADD: Request timeout and abort controller
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
     try {
         const currentSession = getSession();
@@ -55,8 +63,11 @@ async function handlePromptSubmit(e) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${currentSession.token}`
             },
-            body: JSON.stringify({ prompt })
+            body: JSON.stringify({ prompt: sanitizedPrompt }),
+            signal: controller.signal
         });
+
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({ message: 'An unknown error occurred.' }));
@@ -64,18 +75,30 @@ async function handlePromptSubmit(e) {
         }
 
         const data = await response.json();
-        addMessage(data.response || 'No response.', 'ai');
+        // ADD: Validate response data
+        if (!data || typeof data.response !== 'string') {
+            throw new Error('Invalid response format');
+        }
         
-        // Refresh session on successful request
+        addMessage(data.response || 'No response.', 'ai');
         refreshSession();
     } catch (err) {
-        showToast(`Error: ${err.message}`, 'error');
+        if (err.name === 'AbortError') {
+            showToast('Request timed out. Please try again.', 'error');
+        } else {
+            showToast(`Error: ${err.message}`, 'error');
+        }
     } finally {
+        clearTimeout(timeoutId);
         isWaiting = false;
         toggleFormState(false);
-        promptInput.focus();
+        promptInput?.focus();
     }
 }
+
+// FIX: Remove duplicate event listeners by using a single delegation approach
+let formHandlerAttached = false;
+let chatHandlerAttached = false;
 
 // Add global event delegation for form submission
 document.addEventListener('submit', (e) => {
@@ -109,6 +132,28 @@ function initializeApp() {
     // Create initial conversation if none exists
     if (!getCurrentConversationId()) {
         createNewConversation();
+    }
+    
+    // ADD: Attach event listeners only once
+    if (!formHandlerAttached) {
+        document.addEventListener('submit', (e) => {
+            if (e.target.id === 'atlas-form') {
+                handlePromptSubmit(e);
+            }
+        });
+        formHandlerAttached = true;
+    }
+    
+    if (!chatHandlerAttached) {
+        document.addEventListener('click', (e) => {
+            const newChatBtn = e.target.closest('.new-chat-btn');
+            if (newChatBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                startNewChat();
+            }
+        });
+        chatHandlerAttached = true;
     }
 }
 

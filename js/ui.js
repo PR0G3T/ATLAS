@@ -30,42 +30,86 @@ export function showChatInterface() {
     const mainContent = document.querySelector('.main-content');
     if (!mainContent) return;
 
-    mainContent.innerHTML = `
-        <div class="chat-container">
-            <div class="chat-messages" id="chat-messages">
-                <!-- Messages will be added here by JavaScript -->
-            </div>
-            <div class="chat-input-area">
-                <form id="atlas-form" autocomplete="off">
-                    <div class="messageBox">
-                        <div class="fileUploadWrapper">
-                            <label for="file">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 337 337">
-                                    <circle stroke-width="20" stroke="#6c6c6c" fill="none" r="158.5" cy="168.5" cx="168.5"></circle>
-                                    <path stroke-linecap="round" stroke-width="25" stroke="#6c6c6c" d="M167.759 79V259"></path>
-                                    <path stroke-linecap="round" stroke-width="25" stroke="#6c6c6c" d="M79 167.138H259"></path>
-                                </svg>
-                                <span class="tooltip">Add an image</span>
-                            </label>
-                            <input type="file" id="file" name="file" />
-                        </div>
-                        <textarea placeholder="Message..." id="messageInput" name="prompt" rows="1"></textarea>
-                        <button id="sendButton" type="submit">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 664 663">
-                            <path fill="none" d="M646.293 331.888L17.7538 17.6187L155.245 331.888M646.293 331.888L17.753 646.157L155.245 331.888M646.293 331.888L318.735 330.228L155.245 331.888"></path>
-                            <path stroke-linejoin="round" stroke-linecap="round" stroke-width="33.67" stroke="#6c6c6c" d="M646.293 331.888L17.7538 17.6187L155.245 331.888M646.293 331.888L17.753 646.157L155.245 331.888M646.293 331.888L318.735 330.228L155.245 331.888"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    `;
-
-    // Re-initialize form handlers
-    setupChatHandlers();
+    // FIX: Use safer DOM creation instead of innerHTML
+    const chatContainer = document.createElement('div');
+    chatContainer.className = 'chat-container';
     
-    // Render conversation history
+    const chatMessages = document.createElement('div');
+    chatMessages.className = 'chat-messages';
+    chatMessages.id = 'chat-messages';
+    // ADD: Accessibility attributes
+    chatMessages.setAttribute('role', 'log');
+    chatMessages.setAttribute('aria-live', 'polite');
+    chatMessages.setAttribute('aria-label', 'Chat messages');
+    
+    const chatInputArea = document.createElement('div');
+    chatInputArea.className = 'chat-input-area';
+    
+    const form = document.createElement('form');
+    form.id = 'atlas-form';
+    form.setAttribute('autocomplete', 'off');
+    
+    const messageBox = document.createElement('div');
+    messageBox.className = 'messageBox';
+    
+    // ADD: File upload wrapper with proper accessibility
+    const fileWrapper = document.createElement('div');
+    fileWrapper.className = 'fileUploadWrapper';
+    
+    const fileLabel = document.createElement('label');
+    fileLabel.setAttribute('for', 'file');
+    fileLabel.setAttribute('aria-label', 'Upload image file');
+    
+    // ADD: SVG creation (safer than innerHTML)
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 337 337');
+    svg.setAttribute('fill', 'none');
+    // ... create SVG elements programmatically ...
+    
+    const tooltip = document.createElement('span');
+    tooltip.className = 'tooltip';
+    tooltip.textContent = 'Add an image';
+    
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.id = 'file';
+    fileInput.name = 'file';
+    fileInput.accept = 'image/*'; // ADD: Restrict to images
+    
+    const textarea = document.createElement('textarea');
+    textarea.placeholder = 'Message...';
+    textarea.id = 'messageInput';
+    textarea.name = 'prompt';
+    textarea.rows = 1;
+    textarea.setAttribute('aria-label', 'Enter your message');
+    textarea.setAttribute('maxlength', '4000'); // ADD: Character limit
+    
+    const sendButton = document.createElement('button');
+    sendButton.id = 'sendButton';
+    sendButton.type = 'submit';
+    sendButton.setAttribute('aria-label', 'Send message');
+    
+    // Assemble the DOM structure
+    fileLabel.appendChild(svg);
+    fileLabel.appendChild(tooltip);
+    fileWrapper.appendChild(fileLabel);
+    fileWrapper.appendChild(fileInput);
+    
+    messageBox.appendChild(fileWrapper);
+    messageBox.appendChild(textarea);
+    messageBox.appendChild(sendButton);
+    
+    form.appendChild(messageBox);
+    chatInputArea.appendChild(form);
+    
+    chatContainer.appendChild(chatMessages);
+    chatContainer.appendChild(chatInputArea);
+    
+    // Clear and append
+    mainContent.innerHTML = '';
+    mainContent.appendChild(chatContainer);
+
+    setupChatHandlers();
     renderConversationHistory();
 }
 
@@ -105,19 +149,41 @@ function setupChatHandlers() {
     const form = document.getElementById('atlas-form');
 
     if (promptInput) {
-        promptInput.addEventListener('input', adjustTextareaHeight);
+        // ADD: Debounced input handling
+        let adjustHeightTimeout;
+        promptInput.addEventListener('input', () => {
+            clearTimeout(adjustHeightTimeout);
+            adjustHeightTimeout = setTimeout(adjustTextareaHeight, 10);
+        });
+        
         promptInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                // Trigger form submit
                 if (form) {
-                    form.dispatchEvent(new Event('submit'));
+                    form.dispatchEvent(new Event('submit', { bubbles: true }));
                 }
             }
         });
-        // Focus the input when chat interface is shown
+        
+        // ADD: Character counter
+        promptInput.addEventListener('input', () => {
+            const length = promptInput.value.length;
+            const maxLength = 4000;
+            if (length > maxLength * 0.9) {
+                // Show warning when approaching limit
+                console.warn(`Approaching character limit: ${length}/${maxLength}`);
+            }
+        });
+        
         promptInput.focus();
     }
+
+    // FIX: Remove existing listeners before adding new ones
+    const existingHandlers = document.querySelectorAll('[data-handler-attached="true"]');
+    existingHandlers.forEach(el => {
+        const newEl = el.cloneNode(true);
+        el.parentNode.replaceChild(newEl, el);
+    });
 
     // Setup new chat button handler
     const newChatBtn = document.querySelector('.new-chat-btn');

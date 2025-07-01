@@ -6,14 +6,23 @@ const SESSION_KEY = 'atlas_session';
  */
 export function startSession(userData) {
     try {
-        // Add timestamp for session validation
+        // ADD: Validate userData structure
+        if (!userData || typeof userData !== 'object') {
+            throw new Error('Invalid user data');
+        }
+        
+        // ADD: More robust timestamp validation
         const sessionData = {
             ...userData,
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            // ADD: Session version for future compatibility
+            version: '1.0'
         };
         sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
     } catch (error) {
         console.error('Error starting session:', error);
+        // ADD: Better error reporting
+        throw new Error('Failed to create session');
     }
 }
 
@@ -39,15 +48,22 @@ export function getSession() {
         
         const session = JSON.parse(sessionData);
         
-        // Validate session (check if it's not corrupted)
-        if (!session.token || !session.timestamp) {
+        // ADD: More thorough validation
+        if (!session || typeof session !== 'object' || !session.token || !session.timestamp) {
             endSession();
             return null;
         }
         
-        // Optional: Check if session is too old (24 hours)
         const sessionAge = Date.now() - session.timestamp;
-        const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+        const maxAge = 24 * 60 * 60 * 1000;
+        
+        // ADD: Warning before expiry
+        const warningThreshold = maxAge - (2 * 60 * 60 * 1000); // 2 hours before expiry
+        if (sessionAge > warningThreshold && sessionAge < maxAge) {
+            // Could emit an event or show notification
+            console.warn('Session expiring soon');
+        }
+        
         if (sessionAge > maxAge) {
             endSession();
             return null;
@@ -56,7 +72,6 @@ export function getSession() {
         return session;
     } catch (error) {
         console.error('Error retrieving session:', error);
-        // Clean corrupted session
         endSession();
         return null;
     }

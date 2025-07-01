@@ -8,6 +8,25 @@
     background: var(--background-primary);
     width: 100%;
     box-sizing: border-box;
+    
+    /* Better scrolling behavior */
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: var(--text-secondary) var(--background-secondary);
+}
+
+/* Custom scrollbar for webkit browsers */
+#chat-messages::-webkit-scrollbar {
+    width: 8px;
+}
+
+#chat-messages::-webkit-scrollbar-track {
+    background: var(--background-secondary);
+}
+
+#chat-messages::-webkit-scrollbar-thumb {
+    background: var(--text-secondary);
+    border-radius: 4px;
 }
 
 .message {
@@ -15,6 +34,15 @@
     align-items: flex-start;
     gap: 16px;
     max-width: 95%;
+    
+    /* Better spacing and focus states */
+    position: relative;
+}
+
+/* Focus indicators for accessibility */
+.message:focus-within {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
 }
 
 .message.user {
@@ -50,9 +78,49 @@
     font-size: 1rem;
     line-height: 1.6;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    
+    /* Better text wrapping */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    
+    /* Selection styling */
+    user-select: text;
 }
 
 .message.user .bubble {
     background-color: var(--accent-primary);
     color: #fff;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .message .bubble {
+        border: 1px solid currentColor;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    #chat-messages {
+        scroll-behavior: auto;
+    }
+}
+
+/* Better mobile responsiveness */
+@media (max-width: 768px) {
+    .message {
+        max-width: 100%;
+        gap: 12px;
+    }
+    
+    .message .avatar {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .message .bubble {
+        font-size: 0.9rem;
+        padding: 10px 14px;
+    }
 }
