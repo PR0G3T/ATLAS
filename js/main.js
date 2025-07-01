@@ -1,23 +1,11 @@
 import { addMessage } from './addMessage.js';
 import { showToast } from './showToast.js';
-import { getSession, isLoggedIn } from './session.js';
+import { getSession, isLoggedIn, endSession, isSessionValid, refreshSession, clearExampleSessions } from './session.js';
 import { PROMPT_ENDPOINT } from './config.js';
-import { toggleFormState, adjustTextareaHeight, resetPromptInput, showChatInterface, showLoginForm } from './ui.js';
+import { toggleFormState, adjustTextareaHeight, resetPromptInput, showChatInterface } from './ui.js';
+import { createLocalSession } from './auth.js';
 
 let isWaiting = false;
-
-const promptInput = document.getElementById('messageInput');
-const form = document.getElementById('atlas-form');
-
-if (promptInput) {
-    promptInput.addEventListener('input', adjustTextareaHeight);
-    promptInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handlePromptSubmit();
-        }
-    });
-}
 
 async function handlePromptSubmit(e) {
     if (e) e.preventDefault();
@@ -25,6 +13,10 @@ async function handlePromptSubmit(e) {
         showToast('Please wait for a response before asking a new question.', 'error');
         return;
     }
+    
+    const promptInput = document.getElementById('messageInput');
+    if (!promptInput) return;
+    
     const prompt = promptInput.value.trim();
     if (!prompt) {
         showToast('Please enter a question.', 'error');
@@ -32,9 +24,14 @@ async function handlePromptSubmit(e) {
     }
 
     const session = getSession();
-    if (!session) {
-        showToast('You must be logged in to ask a question.', 'error');
-        return;
+    if (!session || !isSessionValid()) {
+        // Create new local session if none exists
+        createLocalSession();
+        const newSession = getSession();
+        if (!newSession) {
+            showToast('Failed to create session.', 'error');
+            return;
+        }
     }
 
     isWaiting = true;
@@ -43,11 +40,12 @@ async function handlePromptSubmit(e) {
     resetPromptInput();
 
     try {
+        const currentSession = getSession();
         const response = await fetch(PROMPT_ENDPOINT, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${session.token}`
+                'Authorization': `Bearer ${currentSession.token}`
             },
             body: JSON.stringify({ prompt })
         });
@@ -59,6 +57,9 @@ async function handlePromptSubmit(e) {
 
         const data = await response.json();
         addMessage(data.response || 'No response.', 'ai');
+        
+        // Refresh session on successful request
+        refreshSession();
     } catch (err) {
         showToast(`Error: ${err.message}`, 'error');
     } finally {
@@ -68,15 +69,22 @@ async function handlePromptSubmit(e) {
     }
 }
 
-if (form) {
-    form.addEventListener('submit', handlePromptSubmit);
-}
+// Add global event delegation for form submission
+document.addEventListener('submit', (e) => {
+    if (e.target.id === 'atlas-form') {
+        handlePromptSubmit(e);
+    }
+});
 
 function initializeApp() {
-    if (isLoggedIn()) {
-        showChatInterface();
+    // Clear any example sessions first
+    clearExampleSessions();
+    
+    // Always show chat interface, create session if needed
+    if (!isLoggedIn() || !isSessionValid()) {
+        createLocalSession();
     } else {
-        showLoginForm();
+        showChatInterface();
     }
 }
 
