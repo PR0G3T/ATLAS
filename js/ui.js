@@ -71,6 +71,7 @@ export function showChatInterface() {
 function setupChatHandlers() {
     const promptInput = document.getElementById('messageInput');
     const form = document.getElementById('atlas-form');
+    const newChatBtn = document.querySelector('.new-chat-btn');
 
     if (promptInput) {
         promptInput.addEventListener('input', adjustTextareaHeight);
@@ -83,5 +84,24 @@ function setupChatHandlers() {
                 }
             }
         });
+    }
+
+    if (newChatBtn) {
+        newChatBtn.addEventListener('click', startNewChat);
+    }
+}
+
+/**
+ * Starts a new chat by clearing messages
+ */
+export function startNewChat() {
+    const chatMessages = document.getElementById('chat-messages');
+    if (chatMessages) {
+        chatMessages.innerHTML = '';
+    }
+    
+    const promptInput = document.getElementById('messageInput');
+    if (promptInput) {
+        promptInput.focus();
     }
 }

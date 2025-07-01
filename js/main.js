@@ -2,7 +2,7 @@ import { addMessage } from './addMessage.js';
 import { showToast } from './showToast.js';
 import { getSession, isLoggedIn, endSession, isSessionValid, refreshSession, clearExampleSessions } from './session.js';
 import { PROMPT_ENDPOINT } from './config.js';
-import { toggleFormState, adjustTextareaHeight, resetPromptInput, showChatInterface } from './ui.js';
+import { toggleFormState, adjustTextareaHeight, resetPromptInput, showChatInterface, startNewChat } from './ui.js';
 import { createLocalSession } from './auth.js';
 
 let isWaiting = false;
@@ -73,6 +73,13 @@ async function handlePromptSubmit(e) {
 document.addEventListener('submit', (e) => {
     if (e.target.id === 'atlas-form') {
         handlePromptSubmit(e);
+    }
+});
+
+// Add global event delegation for new chat button
+document.addEventListener('click', (e) => {
+    if (e.target.closest('.new-chat-btn')) {
+        startNewChat();
     }
 });
 
