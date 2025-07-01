@@ -3,12 +3,18 @@ import { showToast } from './showToast.js';
 
 let isWaiting = false;
 
-const promptInput = document.getElementById('messageInput'); // Utiliser uniquement 'messageInput'
+const promptInput = document.getElementById('messageInput'); // Renommé de messageInput à promptInput
 const sendButton = document.getElementById('sendButton');
-const form = document.getElementById('atlas-form'); // Récupérer le formulaire
+const form = document.getElementById('atlas-form');
 
-console.log('promptInput:', promptInput); // Debug
-console.log('form:', form); // Debug
+function adjustTextareaHeight() {
+    promptInput.style.height = 'auto';
+    promptInput.style.height = (promptInput.scrollHeight) + 'px';
+}
+
+if (promptInput) {
+    promptInput.addEventListener('input', adjustTextareaHeight);
+}
 
 function handlePromptSubmit(e) {
     if (e) e.preventDefault();
@@ -16,21 +22,20 @@ function handlePromptSubmit(e) {
         showToast('Veuillez attendre la réponse avant de poser une nouvelle question.', 'error');
         return;
     }
-    // Ajout d'un log pour diagnostiquer la valeur lue
-    const prompt = promptInput ? promptInput.value.trim() : '';
-    console.log('Valeur du promptInput:', promptInput ? promptInput.value : '(input non trouvé)');
+    const prompt = promptInput.value.trim();
     if (!prompt) {
         showToast('Veuillez entrer une question.', 'error');
         return;
     }
     isWaiting = true;
-    if (promptInput) promptInput.disabled = true;
-    if (sendButton) sendButton.disabled = true;
-    //lol
+    promptInput.disabled = true;
+    sendButton.disabled = true;
 
     addMessage(prompt, 'user');
 
-    if (promptInput) promptInput.value = '';
+    promptInput.value = '';
+    adjustTextareaHeight(); // Reset height
+
     fetch('https://rds.teamcardinalis.com/atlas/prompt', {
         method: 'POST',
         headers: {
@@ -50,34 +55,21 @@ function handlePromptSubmit(e) {
     })
     .finally(() => {
         isWaiting = false;
-        if (promptInput) promptInput.disabled = false;
-        if (sendButton) sendButton.disabled = false;
-        if (promptInput) promptInput.focus();
+        promptInput.disabled = false;
+        sendButton.disabled = false;
+        promptInput.focus();
     });
 }
 
-// Ajout d'un écouteur sur le formulaire pour la soumission
 if (form) {
     form.addEventListener('submit', handlePromptSubmit);
-    console.log('Form submit listener added'); // Debug
 }
 
-// Ajout d'un écouteur sur le bouton d'envoi si ce n'est pas un bouton de type submit
-if (sendButton && form) {
-    sendButton.addEventListener('click', (e) => {
-        // Si le bouton n'est pas de type submit, on déclenche la soumission du formulaire
-        if (sendButton.type !== 'submit') {
-            e.preventDefault();
-            form.requestSubmit ? form.requestSubmit() : handlePromptSubmit(e);
-        }
-    });
-}
-
-// Optionnel : Entrée clavier sur l'input (Enter)
 if (promptInput) {
     promptInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
-            // Le submit du formulaire gère déjà l'envoi, donc rien à faire ici
+            e.preventDefault();
+            handlePromptSubmit();
         }
     });
 }

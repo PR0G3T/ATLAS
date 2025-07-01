@@ -8,5 +8,5 @@ export function showToast(message, type = 'info') {
     setTimeout(() => {
         toast.style.opacity = '0';
         setTimeout(() => container.removeChild(toast), 400);
-    }, 2600);
+    }, 3600);
 }

@@ -1,73 +1,98 @@
+.chat-input-area {
+    padding: 1rem;
+    background-color: var(--background-primary);
+}
+
 .messageBox {
-    position: fixed;
-    left: 50%;
-    bottom: 10px;
-    top: unset;
-    transform: translateX(-50%);
-    z-index: 1000;
-    width: fit-content;
-    height: 50px; /* ajusté pour correspondre à la marge dans .atlas-messages */
     display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #2d2d2d;
-    padding: 0 15px;
-    border-radius: 10px;
-    border: 1px solid rgb(63, 63, 63);
+    align-items: flex-end;
+    background-color: var(--form-input-bg);
+    border-radius: var(--form-radius);
+    border: var(--form-border);
+    padding: var(--form-padding);
+    gap: var(--form-gap);
+    transition: border-color 0.2s ease-in-out;
 }
 
 .messageBox:focus-within {
-  border: 1px solid rgb(110, 110, 110);
+  border-color: var(--accent-primary);
 }
 
 .fileUploadWrapper {
-  width: fit-content;
-  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Inter', Arial, Helvetica, sans-serif;
+  position: relative;
+  align-self: center;
 }
 
 #file {
   display: none;
 }
 
+.fileUploadWrapper label {
+    cursor: pointer;
+}
+
+.fileUploadWrapper svg {
+    width: 24px;
+    height: 24px;
+}
+
+.fileUploadWrapper svg circle, .fileUploadWrapper svg path {
+    stroke: var(--text-secondary);
+    transition: stroke 0.2s ease;
+}
+
+.fileUploadWrapper label:hover svg circle, .fileUploadWrapper label:hover svg path {
+    stroke: var(--text-primary);
+}
+
 .tooltip {
   position: absolute;
-  top: -40px;
+  bottom: 125%; /* Position above the icon */
+  left: 50%;
+  transform: translateX(-50%);
   display: none;
   opacity: 0;
-  color: white;
-  font-size: 10px;
+  color: var(--text-primary);
+  font-size: 12px;
   text-wrap: nowrap;
-  background-color: #000;
+  background-color: var(--background-tertiary);
   padding: 6px 10px;
-  border: 1px solid #3c3c3c;
   border-radius: 5px;
-  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.596);
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
   transition: all 0.3s;
+  z-index: 10;
+}
+
+.fileUploadWrapper:hover .tooltip {
+    display: block;
+    opacity: 1;
 }
 
 #messageInput {
-  width: 200px;
-  height: 100%;
+  flex-grow: 1;
   background-color: transparent;
   outline: none;
   border: none;
-  padding-left: 10px;
-  color: white;
+  color: var(--form-input-color);
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  resize: none;
+  line-height: 1.5;
+  max-height: 150px; /* Limit max height */
+  overflow-y: auto;
+  padding: 4px 0;
 }
 
-#messageInput:focus ~ #sendButton svg path,
-#messageInput:valid ~ #sendButton svg path {
-  fill: #3c3c3c;
-  stroke: white;
+#messageInput::placeholder {
+    color: var(--text-secondary);
 }
 
 #sendButton {
-  width: fit-content;
-  height: 100%;
+  width: 36px;
+  height: 36px;
   background-color: transparent;
   outline: none;
   border: none;
@@ -76,18 +101,29 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s;
+  padding: 0;
+  align-self: center;
 }
 
 #sendButton svg {
-  height: 18px;
+  height: 22px;
   transition: all 0.3s;
 }
 
 #sendButton svg path {
+  stroke: var(--text-secondary);
   transition: all 0.3s;
 }
 
-#sendButton:hover svg path {
-  fill: #3c3c3c;
-  stroke: white;
+#sendButton:hover svg path,
+#messageInput:not(:placeholder-shown) ~ #sendButton svg path {
+  stroke: var(--accent-primary);
+}
+
+#sendButton:disabled {
+    cursor: not-allowed;
+}
+
+#sendButton:disabled svg path {
+    stroke: var(--background-tertiary);
 }
