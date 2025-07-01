@@ -61,9 +61,10 @@ class Atlas {
 
         // Global keyboard shortcuts
         document.addEventListener('keydown', (e) => {
-            // New session with Ctrl+Shift+N
-            if (e.ctrlKey && e.shiftKey && e.key === 'N') {
+            // New session with Ctrl+N
+            if (e.ctrlKey && e.key === 'n' && !e.shiftKey) {
                 e.preventDefault();
+                e.stopPropagation();
                 this.createNewSession();
             }
         });
