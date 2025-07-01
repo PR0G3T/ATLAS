@@ -38,11 +38,6 @@ class Atlas {
     }
     
     setupEventListeners() {
-        // New session
-        document.getElementById('new-session-btn').addEventListener('click', () => {
-            this.createNewSession();
-        });
-        
         // Send message
         document.getElementById('chat-form').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -61,6 +56,15 @@ class Atlas {
             if (e.ctrlKey && e.key === 'Enter') {
                 e.preventDefault();
                 this.sendMessage();
+            }
+        });
+
+        // Global keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // New session with Ctrl+Shift+N
+            if (e.ctrlKey && e.shiftKey && e.key === 'N') {
+                e.preventDefault();
+                this.createNewSession();
             }
         });
     }
