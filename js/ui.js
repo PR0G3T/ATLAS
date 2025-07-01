@@ -1,4 +1,5 @@
 import { endSession } from './session.js';
+import { createNewConversation, renderConversationHistory, loadConversation } from './conversationHistory.js';
 
 const promptInput = document.getElementById('messageInput');
 const sendButton = document.getElementById('sendButton');
@@ -63,6 +64,9 @@ export function showChatInterface() {
 
     // Re-initialize form handlers
     setupChatHandlers();
+    
+    // Render conversation history
+    renderConversationHistory();
 }
 
 /**
@@ -71,6 +75,9 @@ export function showChatInterface() {
 export function startNewChat() {
     // End current session and start fresh
     endSession();
+    
+    // Create new conversation
+    const conversation = createNewConversation();
     
     const chatMessages = document.getElementById('chat-messages');
     if (chatMessages) {
@@ -119,4 +126,15 @@ function setupChatHandlers() {
         newChatBtn.removeEventListener('click', startNewChat);
         newChatBtn.addEventListener('click', startNewChat);
     }
+
+    // Setup conversation item click handlers
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('conversation-item')) {
+            e.preventDefault();
+            const conversationId = e.target.dataset.conversationId;
+            if (conversationId) {
+                loadConversation(conversationId);
+            }
+        }
+    });
 }

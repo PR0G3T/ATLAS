@@ -1,3 +1,5 @@
+import { updateConversation, getCurrentConversationId } from './conversationHistory.js';
+
 export function addMessage(text, sender = 'user') {
     const chatMessages = document.getElementById('chat-messages');
     if (!chatMessages) {
@@ -19,4 +21,15 @@ export function addMessage(text, sender = 'user') {
     chatMessages.appendChild(messageFragment);
 
     chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // Save message to conversation history
+    const conversationId = getCurrentConversationId();
+    if (conversationId) {
+        const message = {
+            text,
+            sender,
+            timestamp: Date.now()
+        };
+        updateConversation(conversationId, message);
+    }
 }

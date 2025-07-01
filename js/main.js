@@ -4,6 +4,7 @@ import { getSession, isLoggedIn, endSession, isSessionValid, refreshSession, cle
 import { PROMPT_ENDPOINT } from './config.js';
 import { toggleFormState, adjustTextareaHeight, resetPromptInput, showChatInterface, startNewChat } from './ui.js';
 import { createLocalSession } from './auth.js';
+import { createNewConversation, getCurrentConversationId } from './conversationHistory.js';
 
 let isWaiting = false;
 
@@ -32,6 +33,13 @@ async function handlePromptSubmit(e) {
             showToast('Failed to create session.', 'error');
             return;
         }
+    }
+
+    // Ensure we have a conversation to save messages to
+    let conversationId = getCurrentConversationId();
+    if (!conversationId) {
+        const conversation = createNewConversation();
+        conversationId = conversation.id;
     }
 
     isWaiting = true;
@@ -96,6 +104,11 @@ function initializeApp() {
         createLocalSession();
     } else {
         showChatInterface();
+    }
+    
+    // Create initial conversation if none exists
+    if (!getCurrentConversationId()) {
+        createNewConversation();
     }
 }
 
