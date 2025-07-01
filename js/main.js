@@ -4,7 +4,7 @@ import { getSession, isLoggedIn, endSession, isSessionValid, refreshSession, cle
 import { PROMPT_ENDPOINT } from './config.js';
 import { toggleFormState, adjustTextareaHeight, resetPromptInput, showChatInterface, startNewChat } from './ui.js';
 import { createLocalSession } from './auth.js';
-import { createNewConversation, getCurrentConversationId } from './conversationHistory.js';
+import { createNewConversation, getCurrentConversationId, getConversations } from './conversationHistory.js';
 
 let isWaiting = false;
 
@@ -96,65 +96,70 @@ async function handlePromptSubmit(e) {
     }
 }
 
-// FIX: Remove duplicate event listeners by using a single delegation approach
-let formHandlerAttached = false;
-let chatHandlerAttached = false;
-
-// Add global event delegation for form submission
-document.addEventListener('submit', (e) => {
-    if (e.target.id === 'atlas-form') {
-        handlePromptSubmit(e);
-    }
-});
-
-// Add global event delegation for new chat button with better targeting
-document.addEventListener('click', (e) => {
-    // Check if clicked element or its parent is the new chat button
-    const newChatBtn = e.target.closest('.new-chat-btn');
-    if (newChatBtn) {
-        e.preventDefault();
-        e.stopPropagation();
-        startNewChat();
-    }
-});
+// Remove duplicate event listener setup
+let eventListenersAttached = false;
 
 function initializeApp() {
+    console.log('Initializing app...');
+    
     // Clear any example sessions first
     clearExampleSessions();
     
     // Always show chat interface, create session if needed
     if (!isLoggedIn() || !isSessionValid()) {
+        console.log('Creating new local session...');
         createLocalSession();
     } else {
+        console.log('Using existing session');
         showChatInterface();
     }
     
-    // Create initial conversation if none exists
-    if (!getCurrentConversationId()) {
-        createNewConversation();
+    // Create initial conversation if none exists OR if no current conversation is set
+    let conversationId = getCurrentConversationId();
+    const conversations = getConversations();
+    
+    console.log('Current conversation ID:', conversationId);
+    console.log('Available conversations:', conversations.length);
+    
+    if (!conversationId || conversations.length === 0) {
+        console.log('Creating initial conversation...');
+        const newConversation = createNewConversation();
+        conversationId = newConversation.id;
     }
     
-    // ADD: Attach event listeners only once
-    if (!formHandlerAttached) {
+    // Force render conversation history
+    setTimeout(() => {
+        renderConversationHistory();
+    }, 200);
+    
+    // Attach event listeners only once
+    if (!eventListenersAttached) {
+        console.log('Attaching event listeners...');
+        
+        // Form submission handler
         document.addEventListener('submit', (e) => {
             if (e.target.id === 'atlas-form') {
                 handlePromptSubmit(e);
             }
         });
-        formHandlerAttached = true;
-    }
-    
-    if (!chatHandlerAttached) {
+        
+        // New chat button handler
         document.addEventListener('click', (e) => {
             const newChatBtn = e.target.closest('.new-chat-btn');
             if (newChatBtn) {
                 e.preventDefault();
                 e.stopPropagation();
+                console.log('New chat button clicked via delegation');
                 startNewChat();
             }
         });
-        chatHandlerAttached = true;
+        
+        eventListenersAttached = true;
+        console.log('Event listeners attached');
     }
 }
+
+// Remove the duplicate event listeners that were being attached globally
+// Keep only the ones in initializeApp
 
 initializeApp();

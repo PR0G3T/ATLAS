@@ -117,11 +117,14 @@ export function showChatInterface() {
  * Starts a new chat by clearing messages
  */
 export function startNewChat() {
+    console.log('Starting new chat...');
+    
     // End current session and start fresh
     endSession();
     
-    // Create new conversation
+    // Create new conversation FIRST
     const conversation = createNewConversation();
+    console.log('Created new conversation:', conversation.id);
     
     const chatMessages = document.getElementById('chat-messages');
     if (chatMessages) {
@@ -138,6 +141,10 @@ export function startNewChat() {
     // Create new session for the new chat
     import('./auth.js').then(({ createLocalSession }) => {
         createLocalSession();
+        // Force render conversation history after session is created
+        setTimeout(() => {
+            renderConversationHistory();
+        }, 100);
     });
 }
 
@@ -178,19 +185,22 @@ function setupChatHandlers() {
         promptInput.focus();
     }
 
-    // FIX: Remove existing listeners before adding new ones
-    const existingHandlers = document.querySelectorAll('[data-handler-attached="true"]');
-    existingHandlers.forEach(el => {
-        const newEl = el.cloneNode(true);
-        el.parentNode.replaceChild(newEl, el);
+    // Remove existing handlers to prevent duplicates - IMPROVED
+    const existingNewChatBtns = document.querySelectorAll('.new-chat-btn[data-listener="true"]');
+    existingNewChatBtns.forEach(btn => {
+        btn.replaceWith(btn.cloneNode(true));
     });
 
-    // Setup new chat button handler
+    // Setup new chat button handler - IMPROVED
     const newChatBtn = document.querySelector('.new-chat-btn');
-    if (newChatBtn) {
-        // Remove existing listeners to prevent duplicates
-        newChatBtn.removeEventListener('click', startNewChat);
-        newChatBtn.addEventListener('click', startNewChat);
+    if (newChatBtn && !newChatBtn.dataset.listener) {
+        newChatBtn.dataset.listener = 'true';
+        newChatBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('New chat button clicked');
+            startNewChat();
+        });
     }
 
     // Setup conversation item click handlers
@@ -199,6 +209,7 @@ function setupChatHandlers() {
             e.preventDefault();
             const conversationId = e.target.dataset.conversationId;
             if (conversationId) {
+                console.log('Loading conversation:', conversationId);
                 loadConversation(conversationId);
             }
         }

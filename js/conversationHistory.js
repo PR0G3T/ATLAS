@@ -63,7 +63,7 @@ function saveConversations(conversations) {
  * Creates a new conversation
  */
 export function createNewConversation() {
-    const conversationId = 'conv_' + Date.now();
+    const conversationId = 'conv_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
     const conversation = {
         id: conversationId,
         title: 'New Chat',
@@ -72,10 +72,18 @@ export function createNewConversation() {
         updatedAt: Date.now()
     };
     
+    console.log('Creating new conversation:', conversation);
+    
     const conversations = getConversations();
     conversations.unshift(conversation);
     saveConversations(conversations);
     setCurrentConversation(conversationId);
+    
+    // Force immediate render
+    renderConversationHistory();
+    
+    console.log('New conversation created and set as current:', conversationId);
+    console.log('Total conversations:', conversations.length);
     
     return conversation;
 }
@@ -174,18 +182,40 @@ export function loadConversation(conversationId) {
  * Renders the conversation history in the sidebar
  */
 export function renderConversationHistory() {
+    console.log('Rendering conversation history...');
+    
     const conversationHistory = document.querySelector('.conversation-history');
-    if (!conversationHistory) return;
+    if (!conversationHistory) {
+        console.warn('Conversation history element not found');
+        return;
+    }
     
     const conversations = getConversations();
     const currentConversationId = getCurrentConversationId();
     
-    conversationHistory.innerHTML = conversations.map(conversation => `
-        <a href="#" class="conversation-item ${conversation.id === currentConversationId ? 'active' : ''}" 
-           data-conversation-id="${conversation.id}">
-            ${conversation.title}
-        </a>
-    `).join('');
+    console.log('Found', conversations.length, 'conversations');
+    console.log('Current conversation ID:', currentConversationId);
+    
+    if (conversations.length === 0) {
+        conversationHistory.innerHTML = '<div class="no-conversations">No conversations yet</div>';
+        return;
+    }
+    
+    const conversationHTML = conversations.map(conversation => {
+        const isActive = conversation.id === currentConversationId;
+        console.log(`Conversation ${conversation.id}: active=${isActive}, title="${conversation.title}"`);
+        
+        return `
+            <a href="#" class="conversation-item ${isActive ? 'active' : ''}" 
+               data-conversation-id="${conversation.id}"
+               title="${conversation.title}">
+                ${conversation.title}
+            </a>
+        `;
+    }).join('');
+    
+    conversationHistory.innerHTML = conversationHTML;
+    console.log('Conversation history rendered successfully');
 }
 
 /**
