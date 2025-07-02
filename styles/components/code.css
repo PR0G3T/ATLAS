@@ -7,7 +7,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #000000;
+  background-color: #343a40;
   padding: 0.5rem 1rem;
   border-top-left-radius: var(--border-radius);
   border-top-right-radius: var(--border-radius);
@@ -62,8 +62,8 @@
 }
 
 .message-bubble pre code.hljs {
-  padding: 0; /* Remove padding from code tag, pre has it */
-  background: transparent; /* Use pre's background */
+  padding: 0;
+  background: #000000;
 }
 
 .message-bubble code {
