@@ -457,12 +457,19 @@ export class SessionManager {
         }));
 
         try {
+            // The API expects a 'prompt' field. We'll use the last message content as the prompt.
+            const lastMessage = messagesForApi.length > 0 ? messagesForApi[messagesForApi.length - 1] : null;
+            const promptText = lastMessage ? lastMessage.content : '';
+
             const response = await fetch('https://rds.teamcardinalis.com/atlas/prompt', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ messages: messagesForApi }),
+                body: JSON.stringify({ 
+                    prompt: promptText,
+                    messages: messagesForApi 
+                }),
             });
 
             this.hideTypingIndicator();
