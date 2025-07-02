@@ -41,6 +41,7 @@ export class ModalManager {
             message = '',
             details = null,
             highlight = null,
+            prompt = null, // New: for input fields
             type = 'warning', // 'warning' or 'danger'
             confirmText = 'Confirm',
             cancelText = 'Cancel'
@@ -72,6 +73,12 @@ export class ModalManager {
                     ${highlight ? `
                         <div class="modal-highlight">
                             ${highlight}
+                        </div>
+                    ` : ''}
+                    ${prompt ? `
+                        <div class="modal-prompt">
+                            <label for="modal-input" class="modal-prompt-label">${prompt.label}</label>
+                            <input type="${prompt.type || 'text'}" id="modal-input" class="modal-prompt-input" placeholder="${prompt.placeholder || ''}" value="${prompt.value || ''}">
                         </div>
                     ` : ''}
                 </div>

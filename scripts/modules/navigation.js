@@ -35,7 +35,7 @@ export class NavigationManager {
     }
 
     loadPageState() {
-        return localStorage.getItem('atlas-current-page') || 'home';
+        return localStorage.getItem('atlas-current-page') || 'session';
     }
 
     getPageTimestamp() {
@@ -61,8 +61,8 @@ export class NavigationManager {
         if (timeDiff < 5 * 60 * 1000) {
             this.navigateToPage(savedPage);
         } else {
-            // If too old, go to home
-            this.navigateToPage('home');
+            // If too old, go to session
+            this.navigateToPage('session');
         }
     }
 
@@ -87,7 +87,7 @@ export class NavigationManager {
     goBack() {
         if (this.pageHistory.length > 1) {
             this.pageHistory.pop(); // Remove current page
-            const previousPage = this.pageHistory[this.pageHistory.length - 1] || 'home';
+            const previousPage = this.pageHistory[this.pageHistory.length - 1] || 'session';
             this.navigateToPage(previousPage);
         }
     }

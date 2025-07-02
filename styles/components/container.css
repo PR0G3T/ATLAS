@@ -1,4 +1,3 @@
-
 /* Hide content until state is restored to prevent flashing */
 .main-content {
   opacity: 1;
@@ -22,21 +21,4 @@
 
 .settings-container.active {
   display: block;
-}
-
-.home-input:focus {
-  outline: none;
-  border-color: var(--button-primary);
-}
-
-.home-input::placeholder {
-  color: rgba(238, 238, 238, 0.5);
-}
-
-/* Main content area */
-.main-content {
-  margin-left: calc(var(--sidebar-width) + var(--sidebar-margin) * 2);
-  min-height: 100vh;
-  width: calc(100vw - var(--sidebar-width) - var(--sidebar-margin) * 2);
-  overflow-x: hidden;
 }

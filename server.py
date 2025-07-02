@@ -23,6 +23,9 @@ class ATLASHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
     
     def log_message(self, format, *args):
+        # Suppress favicon.ico logs
+        if args[0].startswith('GET /favicon.ico'):
+            return
         # Custom logging format
         print(f"[ATLAS Server] {format % args}")
 

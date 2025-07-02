@@ -5,11 +5,11 @@
 import { ModalManager } from './modal.js';
 
 export class SettingsManager {
-    constructor() {
+    constructor(navigationManager) {
         this.isSettingsOpen = false;
         this.settingsContainer = null;
-        this.homeContainer = null;
         this.mainContent = null;
+        this.navigationManager = navigationManager;
         this.currentUsername = this.loadUsername();
         this.currentProfilePicture = this.loadProfilePicture();
         this.modalManager = new ModalManager();
@@ -19,17 +19,14 @@ export class SettingsManager {
 
     init() {
         this.mainContent = document.querySelector('.main-content');
-        this.homeContainer = document.querySelector('.home-container');
         
-        if (!this.homeContainer || !this.mainContent) {
-            console.error('Required containers not found');
+        if (!this.mainContent) {
+            console.error('Main content container not found');
             return;
         }
         
         // Add loading class immediately
-        if (this.mainContent) {
-            this.mainContent.classList.add('loading');
-        }
+        this.mainContent.classList.add('loading');
         
         // Create settings container if it doesn't exist
         this.createSettingsContainer();
@@ -84,9 +81,16 @@ export class SettingsManager {
         const logoElement = document.querySelector('.sidebar-logo');
         if (logoElement) {
             logoElement.removeEventListener('click', this.handleLogoClick);
-            this.handleLogoClick = () => this.goToHomepage();
+            this.handleLogoClick = () => this.handleLogoAction();
             logoElement.addEventListener('click', this.handleLogoClick);
         }
+
+        // Listen for external close settings events
+        window.addEventListener('atlas-close-settings', () => {
+            if (this.isSettingsOpen) {
+                this.closeSettings();
+            }
+        });
     }
 
     toggleSettings() {
@@ -137,8 +141,15 @@ export class SettingsManager {
         });
     }
 
-    savePageState(page = 'home') {
-        localStorage.setItem('atlas-current-page', page);
+    savePageState(page = 'session') {
+        if (this.navigationManager) {
+            this.navigationManager.savePageState(page);
+        } else {
+            // Fallback for when navigationManager is not available
+            localStorage.setItem('atlas-current-page', page);
+            localStorage.setItem('atlas-page-timestamp', Date.now().toString());
+        }
+        this.currentPage = page;
     }
 
     loadPageState() {
@@ -151,9 +162,10 @@ export class SettingsManager {
         this.isSettingsOpen = true;
         this.savePageState('settings');
         
-        // Hide home container and show settings container
-        if (this.homeContainer) {
-            this.homeContainer.classList.add('hidden');
+        // Hide session container
+        const sessionContainer = document.querySelector('.session-container');
+        if (sessionContainer) {
+            sessionContainer.classList.remove('active');
         }
         
         if (this.settingsContainer) {
@@ -381,19 +393,26 @@ export class SettingsManager {
         if (!this.isSettingsOpen) return;
         
         this.isSettingsOpen = false;
-        this.savePageState('home');
+        this.savePageState('session');
         
         // Remove event listener
         document.removeEventListener('keydown', this.handleEscapeKey);
         
-        // Hide settings container and show home container
+        // Hide settings container
         if (this.settingsContainer) {
             this.settingsContainer.classList.remove('active');
             this.settingsContainer.innerHTML = '';
         }
         
-        if (this.homeContainer) {
-            this.homeContainer.classList.remove('hidden');
+        // Always show session interface when closing settings
+        const sessionContainer = document.querySelector('.session-container');
+        if (sessionContainer) {
+            sessionContainer.classList.add('active');
+        } else {
+            // If no session container exists, create a new session
+            window.dispatchEvent(new CustomEvent('atlas-create-new-session', {
+                detail: { source: 'settings-close' }
+            }));
         }
     }
 
@@ -446,7 +465,7 @@ export class SettingsManager {
     async clearCache() {
         const confirmed = await this.modalManager.show({
             title: 'Clear All Cache Data',
-            message: 'You are about to permanently delete all your local data from this browser.',
+            message: 'You are about to permanently delete all your local data from this browser. This action cannot be undone.',
             details: {
                 title: 'This action will remove:',
                 items: [
@@ -485,9 +504,24 @@ export class SettingsManager {
         }
     }
 
-    goToHomepage() {
+    handleLogoAction() {
+        console.log('Logo clicked, settings open:', this.isSettingsOpen);
+        
+        // Always create a new session when logo is clicked
+        // If settings are open, close them first
         if (this.isSettingsOpen) {
             this.closeSettings();
         }
+        
+        // Always create new session regardless of current state
+        this.createNewSession();
+    }
+
+    createNewSession() {
+        console.log('Creating new session from settings');
+        // Dispatch event to session manager
+        window.dispatchEvent(new CustomEvent('atlas-create-new-session', {
+            detail: { source: 'settings-logo' }
+        }));
     }
 }

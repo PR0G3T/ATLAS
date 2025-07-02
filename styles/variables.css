@@ -42,4 +42,7 @@
   --upload-area-bg: rgba(255, 255, 255, 0.05);
   --upload-area-border: rgba(255, 255, 255, 0.2);
   --upload-area-hover: rgba(255, 255, 255, 0.1);
+
+  /* Session Interface */
+  --session-welcome-phrases: "What can I do for you?", "How can I assist you today?", "What would you like to explore?", "How may I help you?", "What's on your mind?";
 }
