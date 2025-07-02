@@ -149,6 +149,20 @@
   box-sizing: border-box;
 }
 
+.message-bubble pre {
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  overflow-x: auto;
+  white-space: pre;
+  word-wrap: normal;
+}
+
+.message-bubble code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9em;
+}
+
 .message.user .message-bubble {
   background: var(--button-primary);
   color: var(--color-text-secondary);
