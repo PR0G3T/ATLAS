@@ -1,0 +1,118 @@
+/* Form components */
+.settings-content-area .form-group {
+  margin-bottom: 0;
+}
+
+.settings-content-area .form-input {
+  width: 100%;
+  max-width: 100%;
+  padding: 0.75rem;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.settings-content-area .form-input:focus {
+  outline: none;
+  border-color: var(--button-primary);
+}
+
+/* Profile Picture Upload */
+.profile-picture-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .profile-picture-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.profile-preview {
+  width: var(--profile-preview-size);
+  height: var(--profile-preview-size);
+  border-radius: var(--profile-image-border-radius);
+  object-fit: cover;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+}
+
+.upload-area {
+  flex: 1;
+  max-width: 300px;
+  min-width: 200px;
+}
+
+@media (max-width: 600px) {
+  .upload-area {
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+.file-input-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.file-input {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.file-input-label {
+  display: block;
+  padding: 0.75rem;
+  background: var(--upload-area-bg);
+  border: 2px dashed var(--upload-area-border);
+  border-radius: var(--border-radius);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: var(--font-size-small);
+  color: var(--color-text-primary);
+  box-sizing: border-box;
+}
+
+.file-input-label:hover,
+.file-input-wrapper:hover .file-input-label {
+  background: var(--upload-area-hover);
+  border-color: var(--button-primary);
+}
+
+.upload-text {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.upload-hint {
+  display: block;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.picture-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-small {
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+}

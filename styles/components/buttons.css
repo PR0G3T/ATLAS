@@ -1,0 +1,101 @@
+
+/* Settings button component */
+.settings-button {
+  margin-top: auto;
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-decoration: none;
+}
+
+.settings-button:hover {
+  background-color: var(--color-button-hover);
+}
+
+.profile-image {
+  width: var(--profile-image-size);
+  height: var(--profile-image-size);
+  border-radius: var(--profile-image-border-radius);
+  flex-shrink: 0;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-grow: 1;
+}
+
+.username {
+  font-size: var(--font-size-small);
+  font-weight: 500;
+}
+
+/* Button components */
+.settings-content-area .button-group {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-start;
+  margin-top: 1.5rem;
+}
+
+.settings-content-area .btn {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-small);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.settings-content-area .btn-primary {
+  background: var(--button-primary);
+  color: var(--color-text-secondary);
+}
+
+.settings-content-area .btn-primary:hover {
+  background: var(--button-primary-hover);
+}
+
+.settings-content-area .btn-secondary {
+  background: var(--button-secondary);
+  color: var(--color-text-primary);
+}
+
+.settings-content-area .btn-secondary:hover {
+  background: var(--button-secondary-hover);
+}
+
+.settings-content-area .btn-warning {
+  background: var(--button-warning);
+  color: var(--color-text-secondary);
+}
+
+.settings-content-area .btn-warning:hover {
+  background: var(--button-warning-hover);
+}
+
+.settings-content-area .btn-danger {
+  background: var(--button-danger);
+  color: var(--color-text-primary);
+}
+
+.settings-content-area .btn-danger:hover {
+  background: var(--button-danger-hover);
+}
+
+.data-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}

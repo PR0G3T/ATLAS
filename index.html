@@ -1,51 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" translate="no">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <meta name="robots" content="notranslate">
     <title>ATLAS</title>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
-    <div id="app">
-        <aside class="sidebar">
-            <div class="sidebar-header" title="Ctrl+N for new session">
-                <div class="sessions-header">
-                    <h3>Conversations</h3>
-                    <span class="shortcut-hint">Ctrl+N</span>
-                </div>
-            </div>
-            <div class="sessions-list" id="sessions-list">
-            </div>
-        </aside>
+    <aside class="sidebar">
+        <!-- ATLAS Logo -->
+        <div class="sidebar-logo">
+            <img src="favicon.svg" alt="ATLAS" class="logo-icon">
+        </div>
         
-        <main class="main-content">
-            <div class="session-container">
-                <div class="messages" id="messages">
-                </div>
-                
-                <form class="input-form" id="chat-form">
-                    <div class="input-container">
-                        <textarea 
-                            id="message-input" 
-                            placeholder="Type your message..."
-                            rows="1"
-                            maxlength="4000"
-                        ></textarea>
-                        <button type="submit" id="send-btn" disabled>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="22" y1="2" x2="11" y2="13"></line>
-                                <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
-                            </svg>
-                        </button>
-                    </div>
-                </form>
+        <!-- Sidebar content -->
+        
+        <button class="settings-button">
+            <img class="profile-image" src="https://api.dicebear.com/7.x/shapes/svg?seed=atlas-user" alt="User profile">
+            <div class="user-info">
+                <span class="username">User</span>
             </div>
-        </main>
-    </div>
+        </button>
+    </aside>
     
-    <div id="toast-container"></div>
-    <script type="module" src="js/main.js"></script>
+    <main class="main-content loading">
+        <div class="home-container">
+            <input type="text" class="home-input" placeholder="Enter your text here...">
+        </div>
+    </main>
+    
+    <script type="module" src="scripts/main.js"></script>
 </body>
 </html>

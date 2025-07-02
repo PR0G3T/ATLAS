@@ -1,0 +1,12 @@
+/* Typography components */
+h1 {
+  font-size: var(--font-size-hero);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.welcome-text {
+  margin-top: 1rem;
+  font-size: var(--font-size-small);
+  opacity: 0.8;
+}

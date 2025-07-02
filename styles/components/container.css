@@ -1,0 +1,42 @@
+
+/* Hide content until state is restored to prevent flashing */
+.main-content {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  margin-left: calc(var(--sidebar-width) + var(--sidebar-margin) * 2);
+  min-height: 100vh;
+  width: calc(100vw - var(--sidebar-width) - var(--sidebar-margin) * 2);
+  overflow-x: hidden;
+}
+
+.main-content.loading {
+  opacity: 0;
+}
+
+/* Settings Container Component */
+.settings-container {
+  padding: 4rem;
+  min-height: 100vh;
+  display: none;
+}
+
+.settings-container.active {
+  display: block;
+}
+
+.home-input:focus {
+  outline: none;
+  border-color: var(--button-primary);
+}
+
+.home-input::placeholder {
+  color: rgba(238, 238, 238, 0.5);
+}
+
+/* Main content area */
+.main-content {
+  margin-left: calc(var(--sidebar-width) + var(--sidebar-margin) * 2);
+  min-height: 100vh;
+  width: calc(100vw - var(--sidebar-width) - var(--sidebar-margin) * 2);
+  overflow-x: hidden;
+}
