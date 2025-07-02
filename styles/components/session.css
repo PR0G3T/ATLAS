@@ -211,8 +211,7 @@
   position: sticky;
   bottom: 0;
   background: var(--color-background);
-  padding: 1rem 0;
-  border-top: 1px solid var(--border);
+  padding: 1rem 0rem 0rem;
 }
 
 .session-input-wrapper {
