@@ -448,7 +448,7 @@ export class SessionManager {
         this.showTypingIndicator();
 
         try {
-            const response = await fetch('https://atlas.teamcardinalis.com/atlas/prompt', {
+            const response = await fetch('https://rds.teamcardinalis.com/atlas/prompt', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
