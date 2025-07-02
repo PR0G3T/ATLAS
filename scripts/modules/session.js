@@ -295,7 +295,7 @@ export class SessionManager {
         
         messageElement.innerHTML = `
             <div class="message-bubble">
-                ${this.escapeHtml(content)}
+                ${this.formatMessageContent(content)}
             </div>
             <span class="message-timestamp">${timestamp}</span>
         `;
@@ -528,6 +528,33 @@ export class SessionManager {
         return div.innerHTML;
     }
 
+    formatMessageContent(text) {
+        const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
+        let lastIndex = 0;
+        let result = '';
+        let match;
+
+        while ((match = codeBlockRegex.exec(text)) !== null) {
+            // Text before the code block
+            const precedingText = text.substring(lastIndex, match.index);
+            result += this.escapeHtml(precedingText);
+
+            // The code block
+            const language = match[1] || 'plaintext';
+            const code = match[2];
+            
+            result += `<pre><code class="language-${this.escapeHtml(language)}">${this.escapeHtml(code)}</code></pre>`;
+            
+            lastIndex = match.index + match[0].length;
+        }
+
+        // Remaining text after the last code block
+        const remainingText = text.substring(lastIndex);
+        result += this.escapeHtml(remainingText);
+
+        return result;
+    }
+
     saveSessionHistory() {
         // Only save non-draft sessions
         const sessionsToSave = this.sessions.filter(session => !session.isDraft);
@@ -576,7 +603,7 @@ export class SessionManager {
         
         messageElement.innerHTML = `
             <div class="message-bubble">
-                ${this.escapeHtml(content)}
+                ${this.formatMessageContent(content)}
             </div>
             <span class="message-timestamp">${timeString}</span>
         `;
