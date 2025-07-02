@@ -50,6 +50,7 @@
 
 .message-bubble pre {
   /* Use highlight.js background but keep our container style */
+  background: #000000;
   padding: 1rem;
   border-bottom-left-radius: var(--border-radius);
   border-bottom-right-radius: var(--border-radius);
@@ -63,7 +64,7 @@
 
 .message-bubble pre code.hljs {
   padding: 0;
-  background: #000000;
+  background: transparent;
 }
 
 .message-bubble code {
