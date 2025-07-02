@@ -76,21 +76,9 @@
   margin-right: 0.5rem;
 }
 
-.session-item-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
+.session-delete-btn {
   opacity: 0;
   visibility: hidden;
-  transition: all 0.2s ease;
-}
-
-.session-item:hover .session-item-actions {
-  opacity: 1;
-  visibility: visible;
-}
-
-.session-action-btn {
   background: none;
   border: none;
   color: var(--color-text-primary);
@@ -105,43 +93,22 @@
   height: 24px;
 }
 
-.session-action-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.session-delete-btn {
-  /* opacity: 0;
-  visibility: hidden; */
-  background: none;
-  border: none;
-  color: var(--color-text-primary);
-  cursor: pointer;
-  padding: 0.25rem;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 24px;
-  height: 24px;
-}
-
-/* .session-item:hover .session-delete-btn {
+.session-item:hover .session-delete-btn {
   opacity: 1;
   visibility: visible;
-} */
+}
 
 .session-delete-btn:hover {
   background-color: var(--button-danger);
   color: white;
 }
 
-.session-action-btn svg {
+.session-delete-btn svg {
   width: 14px;
   height: 14px;
   transition: transform 0.2s ease;
 }
 
-.session-action-btn:hover svg {
+.session-delete-btn:hover svg {
   transform: scale(1.1);
 }
