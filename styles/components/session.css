@@ -151,7 +151,7 @@
 
 /* Code block styling */
 .message-bubble .code-block-wrapper {
-  margin: 1rem 0;
+  margin: 2rem 0rem 0rem 0rem;
 }
 
 .message-bubble .code-block-header {

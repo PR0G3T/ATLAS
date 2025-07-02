@@ -647,7 +647,7 @@ export class SessionManager {
             const originalText = buttonText.textContent;
             
             button.classList.add('copied');
-            buttonText.textContent = 'Copied!';
+            buttonText.textContent = 'Copied';
 
             setTimeout(() => {
                 button.classList.remove('copied');
