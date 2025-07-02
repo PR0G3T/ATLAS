@@ -175,7 +175,6 @@
 .message-bubble .copy-code-btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
   background: transparent;
   border: none;
   color: #ced4da;

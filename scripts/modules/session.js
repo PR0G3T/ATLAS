@@ -559,7 +559,6 @@ export class SessionManager {
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
                             </svg>
-                            <span>Copy</span>
                         </button>
                     </div>
                     <pre><code class="language-${this.escapeHtml(language)}">${this.escapeHtml(code)}</code></pre>
@@ -643,22 +642,14 @@ export class SessionManager {
             await navigator.clipboard.writeText(codeToCopy);
             
             // Visual feedback
-            const buttonText = button.querySelector('span');
-            const originalText = buttonText.textContent;
-            
             button.classList.add('copied');
-            buttonText.textContent = 'Copied';
 
             setTimeout(() => {
                 button.classList.remove('copied');
-                buttonText.textContent = originalText;
             }, 2000);
 
         } catch (err) {
             console.error('Failed to copy code: ', err);
-            const buttonText = button.querySelector('span');
-            buttonText.textContent = 'Error';
-            setTimeout(() => { buttonText.textContent = 'Copy'; }, 2000);
         }
     }
 
