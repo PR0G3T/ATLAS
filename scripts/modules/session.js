@@ -463,9 +463,9 @@ export class SessionManager {
             });
 
             this.hideTypingIndicator();
-            const errorText = await response.text();
 
             if (!response.ok) {
+                const errorText = await response.text();
                 const errorMessage = `API Error: ${response.status} - ${errorText || 'Failed to fetch response.'}`;
                 this.addMessage(errorMessage, 'assistant');
                 console.error(errorMessage);
