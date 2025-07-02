@@ -3,7 +3,6 @@
   display: none; /* Hidden by default */
   flex-direction: column;
   height: 100vh;
-  padding: 2rem;
   box-sizing: border-box;
   position: relative;
 }
