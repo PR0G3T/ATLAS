@@ -171,6 +171,7 @@
 }
 
 .message-timestamp {
+  color: #808080;
   font-size: 0.75rem;
   opacity: 0.6;
   margin-top: 0.5rem;
