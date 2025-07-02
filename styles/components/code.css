@@ -1,0 +1,74 @@
+/* Code block styling */
+.message-bubble .code-block-wrapper {
+  margin: 2rem 0rem 0rem 0rem;
+}
+
+.message-bubble .code-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #343a40;
+  padding: 0.5rem 1rem;
+  border-top-left-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
+  border: 1px solid var(--border);
+  border-bottom: none;
+}
+
+.message-bubble .language-name {
+  font-size: 0.8rem;
+  color: #ced4da;
+  text-transform: uppercase;
+}
+
+.message-bubble .copy-code-btn {
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border: none;
+  color: #ced4da;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--border-radius);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.message-bubble .copy-code-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.message-bubble .copy-code-btn.copied {
+  color: #22c55e; /* Green color for success */
+}
+
+.message-bubble .copy-code-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.message-bubble pre {
+  /* Use highlight.js background but keep our container style */
+  padding: 1rem;
+  border-bottom-left-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+  overflow-x: auto;
+  white-space: pre;
+  word-wrap: normal;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-top: none;
+}
+
+.message-bubble pre code.hljs {
+  padding: 0; /* Remove padding from code tag, pre has it */
+  background: transparent; /* Use pre's background */
+}
+
+.message-bubble code {
+  font-family: 'Fira Code', 'Courier New', Courier, monospace;
+  font-size: 0.9em;
+  background: none;
+  padding: 0;
+}
