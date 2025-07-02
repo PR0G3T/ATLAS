@@ -311,6 +311,11 @@ export class SessionManager {
         this.sessionMessages.appendChild(messageElement);
         this.scrollToBottom();
 
+        // Highlight new code blocks
+        messageElement.querySelectorAll('pre code').forEach((block) => {
+            hljs.highlightElement(block);
+        });
+
         // Add to current session (either real session or draft)
         const currentSession = this.getCurrentSession();
         if (currentSession) {
@@ -629,6 +634,11 @@ export class SessionManager {
         `;
 
         this.sessionMessages.appendChild(messageElement);
+
+        // Highlight new code blocks
+        messageElement.querySelectorAll('pre code').forEach((block) => {
+            hljs.highlightElement(block);
+        });
     }
 
     async handleCopyCode(button) {
