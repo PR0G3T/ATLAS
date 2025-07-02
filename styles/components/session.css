@@ -161,7 +161,7 @@
 .message.user .message-bubble {
   background: var(--color-sidebar-bg);
   color: var(--color-text-primary);
-  border: 1px var(--border);
+  border: 1px solid var(--border);
 }
 
 .message.assistant .message-bubble {
