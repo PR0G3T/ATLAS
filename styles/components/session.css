@@ -119,7 +119,6 @@
   flex: 1;
   overflow-y: auto;
   padding: 1rem 0;
-  margin-bottom: 2rem;
   scroll-behavior: smooth;
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
