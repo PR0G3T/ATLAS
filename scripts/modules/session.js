@@ -537,109 +537,22 @@ export class SessionManager {
         while ((match = codeBlockRegex.exec(text)) !== null) {
             // Text before the code block
             const precedingText = text.substring(lastIndex, match.index);
-            result += this.formatInlineElements(precedingText);
+            result += this.escapeHtml(precedingText);
 
             // The code block
             const language = match[1] || 'plaintext';
             const code = match[2];
-            const codeId = 'code_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             
-            result += `
-                <div class="code-block">
-                    <div class="code-header">
-                        <span class="code-language">${this.escapeHtml(language)}</span>
-                        <button class="code-copy-btn" onclick="window.atlasApp.copyCode('${codeId}', this)">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
-                            </svg>
-                            Copy
-                        </button>
-                    </div>
-                    <pre class="code-content" id="${codeId}">${this.highlightCode(code, language)}</pre>
-                </div>
-            `;
+            result += `<pre><code class="language-${this.escapeHtml(language)}">${this.escapeHtml(code)}</code></pre>`;
             
             lastIndex = match.index + match[0].length;
         }
 
         // Remaining text after the last code block
         const remainingText = text.substring(lastIndex);
-        result += this.formatInlineElements(remainingText);
+        result += this.escapeHtml(remainingText);
 
         return result;
-    }
-
-    formatInlineElements(text) {
-        // Handle inline code
-        const inlineCodeRegex = /`([^`]+)`/g;
-        return text.replace(inlineCodeRegex, (match, code) => {
-            return `<code>${this.escapeHtml(code)}</code>`;
-        });
-    }
-
-    highlightCode(code, language) {
-        // Basic syntax highlighting for common languages
-        const escapedCode = this.escapeHtml(code);
-        
-        if (language === 'javascript' || language === 'js') {
-            return this.highlightJavaScript(escapedCode);
-        } else if (language === 'python' || language === 'py') {
-            return this.highlightPython(escapedCode);
-        } else if (language === 'css') {
-            return this.highlightCSS(escapedCode);
-        } else if (language === 'html') {
-            return this.highlightHTML(escapedCode);
-        } else if (language === 'json') {
-            return this.highlightJSON(escapedCode);
-        }
-        
-        return escapedCode;
-    }
-
-    highlightJavaScript(code) {
-        return code
-            .replace(/\b(const|let|var|function|class|if|else|for|while|return|import|export|async|await|try|catch|throw|new|this)\b/g, '<span class="token keyword">$1</span>')
-            .replace(/\b(true|false|null|undefined)\b/g, '<span class="token boolean">$1</span>')
-            .replace(/\b\d+\.?\d*\b/g, '<span class="token number">$&</span>')
-            .replace(/(["'`])((?:\\.|(?!\1)[^\\])*?)\1/g, '<span class="token string">$&</span>')
-            .replace(/\/\/.*$/gm, '<span class="token comment">$&</span>')
-            .replace(/\/\*[\s\S]*?\*\//g, '<span class="token comment">$&</span>')
-            .replace(/\b([a-zA-Z_$][a-zA-Z0-9_$]*)\s*(?=\()/g, '<span class="token function">$1</span>');
-    }
-
-    highlightPython(code) {
-        return code
-            .replace(/\b(def|class|if|elif|else|for|while|return|import|from|as|try|except|finally|with|lambda|and|or|not|in|is)\b/g, '<span class="token keyword">$1</span>')
-            .replace(/\b(True|False|None)\b/g, '<span class="token boolean">$1</span>')
-            .replace(/\b\d+\.?\d*\b/g, '<span class="token number">$&</span>')
-            .replace(/(["'`])((?:\\.|(?!\1)[^\\])*?)\1/g, '<span class="token string">$&</span>')
-            .replace(/#.*$/gm, '<span class="token comment">$&</span>')
-            .replace(/\b([a-zA-Z_][a-zA-Z0-9_]*)\s*(?=\()/g, '<span class="token function">$1</span>');
-    }
-
-    highlightCSS(code) {
-        return code
-            .replace(/([.#]?[a-zA-Z][a-zA-Z0-9-_]*)\s*{/g, '<span class="token selector">$1</span> {')
-            .replace(/([a-zA-Z-]+)\s*:/g, '<span class="token property">$1</span>:')
-            .replace(/(["'])((?:\\.|(?!\1)[^\\])*?)\1/g, '<span class="token string">$&</span>')
-            .replace(/\/\*[\s\S]*?\*\//g, '<span class="token comment">$&</span>')
-            .replace(/\b\d+\.?\d*(px|em|rem|%|vh|vw|pt|pc|in|cm|mm|ex|ch|fr|vmin|vmax|deg|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)?\b/g, '<span class="token number">$&</span>');
-    }
-
-    highlightHTML(code) {
-        return code
-            .replace(/&lt;(\/?[a-zA-Z][a-zA-Z0-9]*)/g, '<span class="token keyword">&lt;$1</span>')
-            .replace(/([a-zA-Z-]+)=/g, '<span class="token property">$1</span>=')
-            .replace(/(["'])((?:\\.|(?!\1)[^\\])*?)\1/g, '<span class="token string">$&</span>')
-            .replace(/&lt;!--[\s\S]*?--&gt;/g, '<span class="token comment">$&</span>');
-    }
-
-    highlightJSON(code) {
-        return code
-            .replace(/(["'])((?:\\.|(?!\1)[^\\])*?)\1\s*:/g, '<span class="token property">$&</span>')
-            .replace(/:\s*(["'])((?:\\.|(?!\1)[^\\])*?)\1/g, ': <span class="token string">$1$2$1</span>')
-            .replace(/\b(true|false|null)\b/g, '<span class="token boolean">$1</span>')
-            .replace(/\b\d+\.?\d*\b/g, '<span class="token number">$&</span>');
     }
 
     saveSessionHistory() {

@@ -49,50 +49,6 @@ class AtlasApp {
         
         // Initialize Session Manager
         this.sessionManager = new SessionManager();
-
-        // Make app globally available for code copy functionality
-        window.atlasApp = this;
-    }
-
-    // Add copy code functionality
-    async copyCode(codeId, buttonElement) {
-        try {
-            const codeElement = document.getElementById(codeId);
-            if (!codeElement) return;
-
-            const text = codeElement.textContent;
-            await navigator.clipboard.writeText(text);
-
-            // Update button state
-            const originalText = buttonElement.innerHTML;
-            buttonElement.innerHTML = `
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                </svg>
-                Copied!
-            `;
-            buttonElement.classList.add('copied');
-
-            // Reset after 2 seconds
-            setTimeout(() => {
-                buttonElement.innerHTML = originalText;
-                buttonElement.classList.remove('copied');
-            }, 2000);
-
-        } catch (err) {
-            console.error('Failed to copy code:', err);
-            
-            // Fallback for older browsers
-            const codeElement = document.getElementById(codeId);
-            if (codeElement) {
-                const range = document.createRange();
-                range.selectNode(codeElement);
-                window.getSelection().removeAllRanges();
-                window.getSelection().addRange(range);
-                document.execCommand('copy');
-                window.getSelection().removeAllRanges();
-            }
-        }
     }
 
     setupNavigationHandling() {

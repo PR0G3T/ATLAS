@@ -45,29 +45,4 @@
 
   /* Session Interface */
   --session-welcome-phrases: "What can I do for you?", "How can I assist you today?", "What would you like to explore?", "How may I help you?", "What's on your mind?";
-
-  /* Code Blocks */
-  --code-bg: #1a1a1a;
-  --code-bg-secondary: #2d2d2d;
-  --code-border: rgba(255, 255, 255, 0.15);
-  --code-text: #e4e4e7;
-  --code-comment: #6b7280;
-  --code-keyword: #8b5cf6;
-  --code-string: #10b981;
-  --code-number: #f59e0b;
-  --code-function: #06b6d4;
-  --code-variable: #ef4444;
-  --code-line-number: #6b7280;
-  --code-highlight-bg: rgba(139, 92, 246, 0.1);
-  --copy-button-bg: rgba(255, 255, 255, 0.1);
-  --copy-button-hover: rgba(255, 255, 255, 0.2);
-  --copy-success: #10b981;
-
-  /* Code Block Layout */
-  --code-font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', 'Ubuntu Mono', monospace;
-  --code-font-size: 0.875rem;
-  --code-line-height: 1.5;
-  --code-padding: 1.5rem;
-  --code-border-radius: 8px;
-  --code-header-height: 2.5rem;
 }
