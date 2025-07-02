@@ -365,6 +365,9 @@ export class SessionManager {
                 session.messages.forEach(message => {
                     this.addMessageToDOM(message.content, message.sender, message.timestamp);
                 });
+                
+                // Scroll to bottom after loading all messages
+                this.scrollToBottom(true);
             } else {
                 // New session, update welcome phrase
                 this.updateWelcomePhrase();
@@ -527,11 +530,20 @@ export class SessionManager {
         textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px';
     }
 
-    scrollToBottom() {
+    scrollToBottom(force = false) {
         if (this.sessionMessages) {
+            // Use longer timeout for forced scroll (when switching sessions)
+            const delay = force ? 200 : 100;
             setTimeout(() => {
                 this.sessionMessages.scrollTop = this.sessionMessages.scrollHeight;
-            }, 100);
+                
+                // Double-check after a bit more time for dynamic content
+                if (force) {
+                    setTimeout(() => {
+                        this.sessionMessages.scrollTop = this.sessionMessages.scrollHeight;
+                    }, 100);
+                }
+            }, delay);
         }
     }
 
