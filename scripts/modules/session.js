@@ -467,8 +467,7 @@ export class SessionManager {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ 
-                    prompt: promptText,
-                    messages: messagesForApi 
+                    prompt: promptText
                 }),
             });
 
