@@ -465,8 +465,14 @@ export class SessionManager {
             this.hideTypingIndicator();
 
             if (!response.ok) {
-                const errorText = await response.text();
-                const errorMessage = `API Error: ${response.status} - ${errorText || 'Failed to fetch response.'}`;
+                // Try to get error details from the body, but handle cases where it's empty
+                let errorText = '';
+                try {
+                    errorText = await response.text();
+                } catch (e) {
+                    // Ignore if body is empty or already read
+                }
+                const errorMessage = `API Error: ${response.status} - ${errorText || response.statusText || 'Failed to fetch response.'}`;
                 this.addMessage(errorMessage, 'assistant');
                 console.error(errorMessage);
                 this.saveSessionHistory();
