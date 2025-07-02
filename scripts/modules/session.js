@@ -2,6 +2,8 @@
  * Session Module
  * Handles session interface and message management
  */
+import { ModalManager } from './modal.js';
+
 export class SessionManager {
     constructor() {
         this.sessions = [];
@@ -15,6 +17,7 @@ export class SessionManager {
         this.sessionList = null;
         this.welcomeInput = null;
         this.welcomeSendButton = null;
+        this.modalManager = new ModalManager();
         this.welcomePhrases = [
             "What can I do for you?",
             "How can I assist you today?",
@@ -374,21 +377,33 @@ export class SessionManager {
             
             sessionItem.innerHTML = `
                 <span class="session-item-text">${session.title}</span>
-                <button class="session-delete-btn" data-session-id="${session.id}" title="Delete session">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M6 7H5v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7H6zM8 9v10h1V9H8zm3 0v10h1V9h-1zm3 0v10h1V9h-1z"/>
-                        <path d="M15.5 4H14V3a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1H8.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1z"/>
-                    </svg>
-                </button>
+                <div class="session-item-actions">
+                    <button class="session-action-btn session-rename-btn" data-session-id="${session.id}" title="Rename session">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.13,5.12L18.88,8.87M3,17.25V21H6.75L17.81,9.94L14.06,6.19L3,17.25Z" /></svg>
+                    </button>
+                    <button class="session-action-btn session-delete-btn" data-session-id="${session.id}" title="Delete session">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6 7H5v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7H6zM8 9v10h1V9H8zm3 0v10h1V9h-1zm3 0v10h1V9h-1z"/>
+                            <path d="M15.5 4H14V3a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1H8.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1z"/>
+                        </svg>
+                    </button>
+                </div>
             `;
             
             // Handle session click (switch to session)
             sessionItem.addEventListener('click', (e) => {
-                // Don't switch session if delete button was clicked
-                if (e.target.closest('.session-delete-btn')) {
+                // Don't switch session if an action button was clicked
+                if (e.target.closest('.session-action-btn')) {
                     return;
                 }
                 this.switchToSession(session.id);
+            });
+
+            // Handle rename button click
+            const renameBtn = sessionItem.querySelector('.session-rename-btn');
+            renameBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.renameSession(session.id);
             });
 
             // Handle delete button click
@@ -467,7 +482,8 @@ export class SessionManager {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ 
-                    prompt: promptText
+                    prompt: promptText,
+                    messages: messagesForApi // Send full history
                 }),
             });
 
@@ -646,6 +662,32 @@ export class SessionManager {
             // Only update the session list if it's not a draft
             if (!currentSession.isDraft) {
                 this.renderSessionList();
+            }
+        }
+    }
+
+    async renameSession(sessionId) {
+        const session = this.sessions.find(s => s.id === sessionId);
+        if (!session) return;
+
+        const result = await this.modalManager.show({
+            title: 'Rename Session',
+            type: 'info',
+            prompt: {
+                label: 'Enter a new name for the session:',
+                value: session.title
+            },
+            confirmText: 'Save',
+            cancelText: 'Cancel'
+        });
+
+        if (result && result.confirmed && result.value) {
+            const newTitle = result.value.trim();
+            if (newTitle) {
+                session.title = newTitle;
+                session.updatedAt = Date.now();
+                this.renderSessionList();
+                this.saveSessionHistory();
             }
         }
     }
