@@ -39,6 +39,62 @@ export class SessionManager {
         
         // Check if we should restore a session or start fresh
         this.initializeDefaultState();
+        
+        // Add global copy function for code blocks
+        this.setupGlobalCodeCopy();
+    }
+
+    setupGlobalCodeCopy() {
+        // Add global copy function to window for inline onclick handlers
+        window.copyCode = async (codeId, buttonElement) => {
+            try {
+                const codeElement = document.getElementById(codeId);
+                if (!codeElement) return;
+                
+                const code = codeElement.textContent;
+                await navigator.clipboard.writeText(code);
+                
+                // Update button state
+                const originalText = buttonElement.innerHTML;
+                buttonElement.innerHTML = `
+                    <svg class="copy-icon" viewBox="0 0 24 24">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                    </svg>
+                    Copied!
+                `;
+                buttonElement.classList.add('copied');
+                
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    buttonElement.innerHTML = originalText;
+                    buttonElement.classList.remove('copied');
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Failed to copy code:', error);
+                // Fallback for older browsers
+                this.fallbackCopyTextToClipboard(codeElement.textContent);
+            }
+        };
+    }
+
+    fallbackCopyTextToClipboard(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+            document.execCommand('copy');
+        } catch (error) {
+            console.error('Fallback copy failed:', error);
+        }
+        
+        document.body.removeChild(textArea);
     }
 
     initializeDefaultState() {
@@ -537,140 +593,86 @@ export class SessionManager {
         while ((match = codeBlockRegex.exec(text)) !== null) {
             // Text before the code block
             const precedingText = text.substring(lastIndex, match.index);
-            result += this.escapeHtml(precedingText);
+            result += this.formatInlineElements(precedingText);
 
             // The code block
             const language = match[1] || 'plaintext';
             const code = match[2];
+            const codeId = 'code-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
             
-            result += `<pre><code class="language-${this.escapeHtml(language)}">${this.escapeHtml(code)}</code></pre>`;
+            result += this.createCodeBlock(language, code, codeId);
             
             lastIndex = match.index + match[0].length;
         }
 
         // Remaining text after the last code block
         const remainingText = text.substring(lastIndex);
-        result += this.escapeHtml(remainingText);
+        result += this.formatInlineElements(remainingText);
 
         return result;
     }
 
-    saveSessionHistory() {
-        // Only save non-draft sessions
-        const sessionsToSave = this.sessions.filter(session => !session.isDraft);
-        localStorage.setItem('atlas-sessions', JSON.stringify(sessionsToSave));
-        
-        // Only save current session if it's not a draft
-        const currentSession = this.getCurrentSession();
-        if (currentSession && !currentSession.isDraft) {
-            localStorage.setItem('atlas-current-session', this.currentSessionId || '');
-        }
-        
-        localStorage.setItem('atlas-session-active', this.sessionContainer?.classList.contains('active') ? 'true' : 'false');
-        localStorage.setItem('atlas-first-message', this.isFirstMessage ? 'true' : 'false');
-    }
-
-    loadSessionHistory() {
-        const savedSessions = localStorage.getItem('atlas-sessions');
-        const currentSessionId = localStorage.getItem('atlas-current-session');
-        const isSessionActive = localStorage.getItem('atlas-session-active') === 'true';
-        const isFirstMessage = localStorage.getItem('atlas-first-message');
-        
-        if (isFirstMessage !== null) {
-            this.isFirstMessage = isFirstMessage === 'true';
-        }
-
-        if (savedSessions) {
-            this.sessions = JSON.parse(savedSessions);
-            this.renderSessionList();
-        }
-
-        if (currentSessionId && this.sessions.find(s => s.id === currentSessionId)) {
-            this.currentSessionId = currentSessionId;
-            
-            if (isSessionActive) {
-                this.switchToSession(currentSessionId);
-            }
-        }
-    }
-
-    addMessageToDOM(content, sender, timestamp) {
-        const messageElement = document.createElement('div');
-        messageElement.className = `message ${sender}`;
-        
-        const date = new Date(timestamp);
-        const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        
-        messageElement.innerHTML = `
-            <div class="message-bubble">
-                ${this.formatMessageContent(content)}
-            </div>
-            <span class="message-timestamp">${timeString}</span>
+    createCodeBlock(language, code, codeId) {
+        const displayLanguage = this.getLanguageDisplayName(language);
+        return `
+            <pre>
+                <div class="code-header">
+                    <span class="code-language">${displayLanguage}</span>
+                    <button class="copy-button" onclick="window.copyCode('${codeId}', this)">
+                        <svg class="copy-icon" viewBox="0 0 24 24">
+                            <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                        </svg>
+                        Copy
+                    </button>
+                </div>
+                <code id="${codeId}" class="language-${this.escapeHtml(language)}">${this.escapeHtml(code)}</code>
+            </pre>
         `;
-
-        this.sessionMessages.appendChild(messageElement);
     }
 
-    clearAllSessions() {
-        this.sessions = [];
-        this.currentSessionId = null;
-        this.draftSession = null; // Clear draft session too
-        this.isFirstMessage = true;
-        this.clearMessages();
-        this.renderSessionList();
+    getLanguageDisplayName(language) {
+        const languageNames = {
+            'js': 'JavaScript',
+            'javascript': 'JavaScript',
+            'ts': 'TypeScript',
+            'typescript': 'TypeScript',
+            'py': 'Python',
+            'python': 'Python',
+            'java': 'Java',
+            'cpp': 'C++',
+            'c': 'C',
+            'cs': 'C#',
+            'php': 'PHP',
+            'rb': 'Ruby',
+            'ruby': 'Ruby',
+            'go': 'Go',
+            'rs': 'Rust',
+            'rust': 'Rust',
+            'swift': 'Swift',
+            'kt': 'Kotlin',
+            'kotlin': 'Kotlin',
+            'dart': 'Dart',
+            'html': 'HTML',
+            'css': 'CSS',
+            'scss': 'SCSS',
+            'sass': 'Sass',
+            'json': 'JSON',
+            'xml': 'XML',
+            'yaml': 'YAML',
+            'yml': 'YAML',
+            'md': 'Markdown',
+            'markdown': 'Markdown',
+            'sql': 'SQL',
+            'sh': 'Shell',
+            'bash': 'Bash',
+            'zsh': 'Zsh',
+            'powershell': 'PowerShell',
+            'dockerfile': 'Dockerfile',
+            'makefile': 'Makefile',
+            'plaintext': 'Plain Text',
+            '': 'Code'
+        };
         
-        if (this.sessionContainer) {
-            this.sessionContainer.classList.remove('active');
-        }
-        
-        this.saveSessionHistory();
-    }
-
-    showSessionInterface() {
-        // Force close settings first
-        const settingsContainer = document.querySelector('.settings-container');
-        if (settingsContainer && settingsContainer.classList.contains('active')) {
-            window.dispatchEvent(new CustomEvent('atlas-close-settings'));
-        }
-        
-        if (this.sessionContainer) {
-            this.sessionContainer.classList.add('active');
-        }
-        this.saveSessionHistory();
-    }
-
-    hideSessionInterface() {
-        if (this.sessionContainer) {
-            this.sessionContainer.classList.remove('active');
-        }
-        this.saveSessionHistory();
-    }
-
-    handleFirstMessage(message) {
-        console.log('Handling first message:', message);
-        
-        // Always create a new session for first message
-        this.createNewSession();
-        
-        // Wait for session creation then send message
-        setTimeout(() => {
-            if (this.welcomeInput) {
-                this.welcomeInput.value = message;
-                this.sendWelcomeMessage();
-            }
-        }, 150);
-    }
-
-    updateSessionTitle(message) {
-        const currentSession = this.getCurrentSession();
-        if (currentSession && currentSession.title === 'New Session') {
-            // Use first 30 characters of message as title
-            currentSession.title = message.length > 30 ? message.substring(0, 30) + '...' : message;
-            
-            // Only update the session list if it's not a draft
-            if (!currentSession.isDraft) {
-                this.renderSessionList();
-            }
-        }
+        return languageNames[language.toLowerCase()] || language.toUpperCase();
     }
 }

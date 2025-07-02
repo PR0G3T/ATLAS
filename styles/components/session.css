@@ -150,17 +150,142 @@
 }
 
 .message-bubble pre {
-  background-color: rgba(0, 0, 0, 0.2);
-  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 0;
   border-radius: var(--border-radius);
-  overflow-x: auto;
-  white-space: pre;
-  word-wrap: normal;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 0.5rem 0;
 }
 
-.message-bubble code {
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 0.9em;
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.8rem;
+  color: rgba(238, 238, 238, 0.7);
+}
+
+.code-language {
+  font-family: var(--font-family-primary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.copy-button {
+  background: none;
+  border: none;
+  color: rgba(238, 238, 238, 0.7);
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-family: var(--font-family-primary);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.copy-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text-primary);
+}
+
+.copy-button.copied {
+  color: #22c55e;
+}
+
+.copy-icon {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+.message-bubble pre code {
+  display: block;
+  padding: 1rem;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Courier New', monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #e2e8f0;
+  white-space: pre;
+  overflow-x: auto;
+  background: transparent;
+}
+
+/* Syntax highlighting */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in {
+  color: #ff79c6;
+}
+
+.hljs-string,
+.hljs-attr {
+  color: #f1fa8c;
+}
+
+.hljs-number,
+.hljs-literal {
+  color: #bd93f9;
+}
+
+.hljs-comment {
+  color: #6272a4;
+  font-style: italic;
+}
+
+.hljs-function,
+.hljs-title {
+  color: #50fa7b;
+}
+
+.hljs-variable,
+.hljs-name {
+  color: #8be9fd;
+}
+
+.hljs-operator {
+  color: #ff79c6;
+}
+
+.hljs-punctuation {
+  color: #f8f8f2;
+}
+
+/* Inline code styling */
+.message-bubble code:not(pre code) {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ff79c6;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Courier New', monospace;
+  font-size: 0.85em;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Code block scrollbar */
+.message-bubble pre code::-webkit-scrollbar {
+  height: 8px;
+}
+
+.message-bubble pre code::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.message-bubble pre code::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.message-bubble pre code::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .message.user .message-bubble {
