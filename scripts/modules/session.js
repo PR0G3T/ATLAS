@@ -442,36 +442,24 @@ export class SessionManager {
     }
 
     async getAssistantResponse() {
+        const currentSession = this.getCurrentSession();
+        if (!currentSession) return;
+
         this.showTypingIndicator();
 
-        const currentSession = this.getCurrentSession();
-        if (!currentSession) {
-            this.hideTypingIndicator();
-            console.error("No current session found to get assistant response.");
-            return;
-        }
-
-        const messagesForApi = currentSession.messages.map(msg => ({
-            role: msg.sender,
-            content: msg.content
-        }));
-
         try {
-            // The API expects a 'prompts' field containing the conversation history.
-            const response = await fetch('https://rds.teamcardinalis.com/atlas/prompt', {
+            const response = await fetch('/api/assistant', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ 
-                    prompts: messagesForApi
-                }),
+                body: JSON.stringify({ prompts: currentSession.messages })
             });
 
             this.hideTypingIndicator();
+            const errorText = await response.text();
 
             if (!response.ok) {
-                const errorText = await response.text();
                 const errorMessage = `API Error: ${response.status} - ${errorText || 'Failed to fetch response.'}`;
                 this.addMessage(errorMessage, 'assistant');
                 console.error(errorMessage);
