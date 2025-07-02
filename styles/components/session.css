@@ -159,8 +159,9 @@
 /* Code block styling has been moved to components/code.css */
 
 .message.user .message-bubble {
-  background: var(--button-primary);
+  background: var(--color-sidebar-bg);
   color: var(--color-text-secondary);
+  border: 1px var(--border);
 }
 
 .message.assistant .message-bubble {
