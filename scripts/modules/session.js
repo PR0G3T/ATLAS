@@ -73,9 +73,6 @@ export class SessionManager {
                 </div>
             </div>
             <div class="session-messages"></div>
-            <div class="typing-indicator">
-                <span class="typing-dots">Assistant is typing</span>
-            </div>
             <div class="session-input-container">
                 <div class="session-input-wrapper">
                     <textarea 
@@ -94,7 +91,6 @@ export class SessionManager {
         this.sessionMessages = this.sessionContainer.querySelector('.session-messages');
         this.sessionInput = this.sessionContainer.querySelector('.session-input');
         this.sendButton = this.sessionContainer.querySelector('.send-button');
-        this.typingIndicator = this.sessionContainer.querySelector('.typing-indicator');
         this.welcomeInput = this.sessionContainer.querySelector('.session-welcome-input');
         this.welcomeSendButton = this.sessionContainer.querySelector('.session-welcome-send');
     }
@@ -511,15 +507,25 @@ export class SessionManager {
     }
 
     showTypingIndicator() {
-        if (this.typingIndicator) {
-            this.typingIndicator.classList.add('active');
-            this.scrollToBottom();
-        }
+        // Create typing indicator element
+        const typingElement = document.createElement('div');
+        typingElement.className = 'typing-indicator active';
+        typingElement.innerHTML = `
+            <div class="message-bubble">
+                <span class="typing-dots">Assistant is typing</span>
+            </div>
+        `;
+        
+        // Add to messages container
+        this.sessionMessages.appendChild(typingElement);
+        this.typingIndicator = typingElement;
+        this.scrollToBottom();
     }
 
     hideTypingIndicator() {
-        if (this.typingIndicator) {
-            this.typingIndicator.classList.remove('active');
+        if (this.typingIndicator && this.typingIndicator.parentNode) {
+            this.typingIndicator.parentNode.removeChild(this.typingIndicator);
+            this.typingIndicator = null;
         }
     }
 

@@ -111,7 +111,6 @@
 
 /* Hide chat elements in welcome mode */
 .session-container.welcome-mode .session-messages,
-.session-container.welcome-mode .typing-indicator,
 .session-container.welcome-mode .session-input-container {
   display: none;
 }
@@ -176,6 +175,36 @@
   opacity: 0.6;
   margin-top: 0.5rem;
   display: block;
+}
+
+/* Typing indicator styled as assistant message */
+.typing-indicator {
+  display: none;
+  margin-bottom: 1.5rem;
+  max-width: 80%;
+  margin-right: auto;
+  text-align: left;
+  animation: fadeInUp 0.3s ease;
+}
+
+.typing-indicator.active {
+  display: block;
+}
+
+.typing-indicator .message-bubble {
+  background: transparent;
+  padding: 1rem 0rem;
+  color: #999;
+  font-style: italic;
+}
+
+.typing-dots {
+  display: inline-block;
+}
+
+.typing-dots::after {
+  content: '...';
+  animation: typingDots 1.5s infinite;
 }
 
 .session-input-container {
@@ -244,27 +273,6 @@
 .send-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.typing-indicator {
-  display: none;
-  padding: 1rem 1.5rem;
-  color: #999;
-  font-style: italic;
-  margin-bottom: 1rem;
-}
-
-.typing-indicator.active {
-  display: block;
-}
-
-.typing-dots {
-  display: inline-block;
-}
-
-.typing-dots::after {
-  content: '...';
-  animation: typingDots 1.5s infinite;
 }
 
 @keyframes fadeInUp {
