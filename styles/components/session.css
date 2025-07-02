@@ -164,9 +164,8 @@
 }
 
 .message.assistant .message-bubble {
-  background: var(--color-sidebar-bg);
+  background: transparent;
   color: var(--color-text-primary);
-  border: 1px solid var(--border);
 }
 
 .message-timestamp {
