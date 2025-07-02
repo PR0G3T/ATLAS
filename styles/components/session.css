@@ -166,6 +166,7 @@
 
 .message.assistant .message-bubble {
   background: transparent;
+  padding: 0rem;
   color: var(--color-text-primary);
 }
 
