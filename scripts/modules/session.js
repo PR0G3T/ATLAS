@@ -448,12 +448,18 @@ export class SessionManager {
         this.showTypingIndicator();
 
         try {
+            // Map messages to the format expected by the API: { role, content }
+            const prompts = currentSession.messages.map(msg => ({
+                role: msg.sender,
+                content: msg.content
+            }));
+
             const response = await fetch('https://rds.teamcardinalis.com/atlas/prompt', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ prompts: currentSession.messages })
+                body: JSON.stringify({ prompts: prompts })
             });
 
             this.hideTypingIndicator();
