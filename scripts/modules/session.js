@@ -1,20 +1,24 @@
 /**
- * Session Module
- * Handles session interface and message management
+ * Session Manager
+ * Coordinates session interface and delegates to specialized managers
  */
+import { MessageManager } from './messageManager.js';
+import { APIManager } from './apiManager.js';
+import { SessionStateManager } from './sessionStateManager.js';
+
 export class SessionManager {
     constructor() {
-        this.sessions = [];
-        this.currentSessionId = null;
-        this.draftSession = null; // Track draft session that hasn't been saved yet
-        this.isFirstMessage = true;
+        this.messageManager = null;
+        this.apiManager = null;
+        this.stateManager = null;
+        
         this.sessionContainer = null;
         this.sessionInput = null;
-        this.sessionMessages = null;
         this.sendButton = null;
         this.sessionList = null;
         this.welcomeInput = null;
         this.welcomeSendButton = null;
+        
         this.welcomePhrases = [
             "What can I do for you?",
             "How can I assist you today?",
@@ -25,33 +29,23 @@ export class SessionManager {
             "What brings you here today?",
             "How can I make your day better?"
         ];
+        
+        this.lastSessionCreated = 0;
         this.init();
     }
 
     init() {
         this.sessionList = document.querySelector('.session-list');
+        this.stateManager = new SessionStateManager();
+        this.apiManager = new APIManager();
+        
         this.createSessionContainer();
+        this.messageManager = new MessageManager(this.sessionContainer);
+        
         this.bindEvents();
-        this.loadSessionHistory();
-        
-        // Listen for custom events
         this.bindCustomEvents();
-        
-        // Check if we should restore a session or start fresh
+        this.renderSessionList();
         this.initializeDefaultState();
-    }
-
-    initializeDefaultState() {
-        const savedSessions = localStorage.getItem('atlas-sessions');
-        const currentSessionId = localStorage.getItem('atlas-current-session');
-        const currentPage = localStorage.getItem('atlas-current-page');
-        
-        // If no settings page and no active session, create a new session
-        if (currentPage !== 'settings' && (!currentSessionId || !savedSessions)) {
-            setTimeout(() => {
-                this.createNewSession();
-            }, 100);
-        }
     }
 
     createSessionContainer() {
@@ -86,47 +80,22 @@ export class SessionManager {
         `;
 
         mainContent.appendChild(this.sessionContainer);
+        this.getElementReferences();
+    }
 
-        // Get references to elements
-        this.sessionMessages = this.sessionContainer.querySelector('.session-messages');
+    getElementReferences() {
         this.sessionInput = this.sessionContainer.querySelector('.session-input');
         this.sendButton = this.sessionContainer.querySelector('.send-button');
         this.welcomeInput = this.sessionContainer.querySelector('.session-welcome-input');
         this.welcomeSendButton = this.sessionContainer.querySelector('.session-welcome-send');
     }
 
-    bindCustomEvents() {
-        // Listen for new session creation - use more specific event name
-        window.addEventListener('atlas-create-new-session', (e) => {
-            console.log('Creating new session from:', e.detail?.source);
-            this.createNewSession();
-        });
-        
-        // Keep the old event for backward compatibility
-        window.addEventListener('atlas-create-session', (e) => {
-            console.log('Creating session (legacy event)');
-            this.createNewSession();
-        });
-    }
-
-    getRandomWelcomePhrase() {
-        return this.welcomePhrases[Math.floor(Math.random() * this.welcomePhrases.length)];
-    }
-
     bindEvents() {
         if (!this.sessionInput || !this.sendButton || !this.welcomeInput || !this.welcomeSendButton) return;
 
-        // Handle regular send button click
-        this.sendButton.addEventListener('click', () => {
-            this.sendMessage();
-        });
+        this.sendButton.addEventListener('click', () => this.sendMessage());
+        this.welcomeSendButton.addEventListener('click', () => this.sendWelcomeMessage());
 
-        // Handle welcome send button click
-        this.welcomeSendButton.addEventListener('click', () => {
-            this.sendWelcomeMessage();
-        });
-
-        // Handle Enter key for regular input
         this.sessionInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -134,7 +103,6 @@ export class SessionManager {
             }
         });
 
-        // Handle Enter key for welcome input
         this.welcomeInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -142,7 +110,6 @@ export class SessionManager {
             }
         });
 
-        // Auto-resize textareas
         this.sessionInput.addEventListener('input', () => {
             this.autoResizeTextarea(this.sessionInput);
         });
@@ -150,18 +117,31 @@ export class SessionManager {
         this.welcomeInput.addEventListener('input', () => {
             this.autoResizeTextarea(this.welcomeInput);
         });
+    }
 
-        // Handle copy code button clicks
-        this.sessionMessages.addEventListener('click', (e) => {
-            const copyBtn = e.target.closest('.copy-code-btn');
-            if (copyBtn) {
-                this.handleCopyCode(copyBtn);
-            }
+    bindCustomEvents() {
+        window.addEventListener('atlas-create-new-session', (e) => {
+            console.log('Creating new session from:', e.detail?.source);
+            this.createNewSession();
+        });
+        
+        window.addEventListener('atlas-create-session', (e) => {
+            console.log('Creating session (legacy event)');
+            this.createNewSession();
         });
     }
 
+    initializeDefaultState() {
+        const currentPage = localStorage.getItem('atlas-current-page');
+        
+        if (currentPage !== 'settings' && !this.stateManager.currentSessionId) {
+            setTimeout(() => {
+                this.createNewSession();
+            }, 100);
+        }
+    }
+
     createNewSession() {
-        // Prevent creating multiple sessions rapidly
         const now = Date.now();
         if (this.lastSessionCreated && (now - this.lastSessionCreated) < 500) {
             console.log('Session creation throttled');
@@ -169,27 +149,11 @@ export class SessionManager {
         }
         this.lastSessionCreated = now;
 
-        const sessionId = Date.now().toString();
-        const session = {
-            id: sessionId,
-            title: 'New Session',
-            messages: [],
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-            isDraft: true // Mark as draft initially
-        };
-
-        // Store as draft session instead of adding to sessions array
-        this.draftSession = session;
-        this.currentSessionId = sessionId;
-        
-        // Don't save to localStorage yet - wait for first message
-        
-        this.showSessionInterface();
-        this.clearMessages();
+        const session = this.stateManager.createSession();
+        this.messageManager.clearMessages();
         this.setWelcomeMode(true);
+        this.showSessionInterface();
 
-        // Focus on welcome input and set new phrase
         setTimeout(() => {
             this.updateWelcomePhrase();
             if (this.welcomeInput) {
@@ -197,7 +161,151 @@ export class SessionManager {
             }
         }, 100);
 
-        console.log('Draft session created:', sessionId);
+        console.log('Draft session created:', session.id);
+    }
+
+    async sendWelcomeMessage() {
+        const message = this.welcomeInput.value.trim();
+        if (!message) return;
+
+        const currentSession = this.stateManager.getCurrentSession();
+        if (currentSession && currentSession.isDraft) {
+            this.stateManager.commitDraftSession();
+            this.renderSessionList();
+        }
+
+        this.setWelcomeMode(false);
+        await this.processMessage(message);
+        this.welcomeInput.value = '';
+    }
+
+    async sendMessage() {
+        const message = this.sessionInput.value.trim();
+        if (!message) return;
+
+        if (!this.stateManager.currentSessionId) {
+            this.createNewSession();
+            setTimeout(() => this.sendWelcomeMessage(), 50);
+            this.welcomeInput.value = message;
+            return;
+        }
+
+        await this.processMessage(message);
+        this.sessionInput.value = '';
+        this.autoResizeTextarea(this.sessionInput);
+    }
+
+    async processMessage(content) {
+        const messageData = this.messageManager.addMessage(content, 'user');
+        this.stateManager.addMessageToSession(messageData);
+        
+        await this.getAssistantResponse();
+        this.stateManager.saveSessionHistory();
+    }
+
+    async getAssistantResponse() {
+        const currentSession = this.stateManager.getCurrentSession();
+        if (!currentSession) return;
+
+        this.messageManager.showTypingIndicator();
+
+        try {
+            const response = await this.apiManager.getAssistantResponse(currentSession.messages);
+            this.messageManager.hideTypingIndicator();
+            
+            const messageData = this.messageManager.addMessage(response, 'assistant');
+            this.stateManager.addMessageToSession(messageData);
+            
+        } catch (error) {
+            this.messageManager.hideTypingIndicator();
+            const messageData = this.messageManager.addMessage(error.message, 'assistant');
+            this.stateManager.addMessageToSession(messageData);
+            console.error('Error fetching assistant response:', error);
+        }
+    }
+
+    switchToSession(sessionId) {
+        const settingsContainer = document.querySelector('.settings-container');
+        const isSettingsOpen = settingsContainer && settingsContainer.classList.contains('active');
+        
+        if (isSettingsOpen) {
+            window.dispatchEvent(new CustomEvent('atlas-close-settings'));
+        }
+
+        const session = this.stateManager.switchToSession(sessionId);
+        this.messageManager.clearMessages();
+        
+        if (session) {
+            const hasMessages = session.messages && session.messages.length > 0;
+            this.setWelcomeMode(!hasMessages);
+            
+            if (hasMessages) {
+                session.messages.forEach(message => {
+                    this.messageManager.addMessage(message.content, message.sender, message.timestamp);
+                });
+                this.messageManager.scrollToBottom(true);
+            } else {
+                this.updateWelcomePhrase();
+            }
+        }
+        
+        this.renderSessionList();
+        this.showSessionInterface();
+    }
+
+    renderSessionList() {
+        if (!this.sessionList) return;
+
+        this.sessionList.innerHTML = '';
+        
+        this.stateManager.getSessionList().forEach(session => {
+            const sessionItem = document.createElement('button');
+            sessionItem.className = `session-item ${session.id === this.stateManager.currentSessionId ? 'active' : ''}`;
+            
+            sessionItem.innerHTML = `
+                <span class="session-item-text">${session.title}</span>
+                <button class="session-delete-btn" data-session-id="${session.id}" title="Delete session">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6 7H5v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7H6zM8 9v10h1V9H8zm3 0v10h1V9h-1zm3 0v10h1V9h-1z"/>
+                        <path d="M15.5 4H14V3a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1H8.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1z"/>
+                    </svg>
+                </button>
+            `;
+            
+            sessionItem.addEventListener('click', (e) => {
+                if (e.target.closest('.session-delete-btn')) return;
+                this.switchToSession(session.id);
+            });
+
+            const deleteBtn = sessionItem.querySelector('.session-delete-btn');
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.deleteSession(session.id);
+            });
+            
+            this.sessionList.appendChild(sessionItem);
+        });
+    }
+
+    deleteSession(sessionId) {
+        const session = this.stateManager.sessions.find(s => s.id === sessionId);
+        if (!session) return;
+
+        if (!confirm(`Delete session "${session.title}"?`)) return;
+
+        const nextSession = this.stateManager.deleteSession(sessionId);
+        
+        if (nextSession) {
+            this.switchToSession(nextSession.id);
+        } else {
+            this.hideSessionInterface();
+        }
+
+        this.renderSessionList();
+    }
+
+    getRandomWelcomePhrase() {
+        return this.welcomePhrases[Math.floor(Math.random() * this.welcomePhrases.length)];
     }
 
     setWelcomeMode(isWelcome) {
@@ -217,318 +325,6 @@ export class SessionManager {
         }
     }
 
-    sendWelcomeMessage() {
-        const message = this.welcomeInput.value.trim();
-        if (!message) return;
-
-        // Convert draft session to real session on first message
-        if (this.draftSession && this.draftSession.isDraft) {
-            this.commitDraftSession();
-        }
-
-        // Switch to chat mode
-        this.setWelcomeMode(false);
-        
-        // Add user message
-        this.addMessage(message, 'user');
-        
-        // Update session title
-        this.updateSessionTitle(message);
-        
-        // Clear welcome input
-        this.welcomeInput.value = '';
-        
-        // Simulate assistant response
-        this.getAssistantResponse();
-        
-        this.saveSessionHistory();
-    }
-
-    commitDraftSession() {
-        if (!this.draftSession) return;
-
-        // Mark as no longer draft
-        this.draftSession.isDraft = false;
-        
-        // Add to sessions array
-        this.sessions.unshift(this.draftSession);
-        
-        // Update session list
-        this.renderSessionList();
-        
-        // Clear draft
-        this.draftSession = null;
-        
-        // Save current session ID
-        localStorage.setItem('atlas-current-session', this.currentSessionId);
-        
-        console.log('Draft session committed:', this.currentSessionId);
-    }
-
-    sendMessage() {
-        const message = this.sessionInput.value.trim();
-        if (!message) return;
-
-        // Create new session if none exists
-        if (!this.currentSessionId) {
-            this.createNewSession();
-            // Wait for session creation then send message
-            setTimeout(() => this.sendWelcomeMessage(), 50);
-            this.welcomeInput.value = message;
-            return;
-        }
-
-        // Add user message
-        this.addMessage(message, 'user');
-        
-        // Clear input
-        this.sessionInput.value = '';
-        this.autoResizeTextarea(this.sessionInput);
-        
-        // Simulate assistant response
-        this.getAssistantResponse();
-        
-        this.saveSessionHistory();
-    }
-
-    addMessage(content, sender) {
-        const messageElement = document.createElement('div');
-        messageElement.className = `message ${sender}`;
-        
-        const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        
-        messageElement.innerHTML = `
-            <div class="message-bubble">
-                ${this.formatMessageContent(content)}
-            </div>
-            <span class="message-timestamp">${timestamp}</span>
-        `;
-
-        this.sessionMessages.appendChild(messageElement);
-        this.scrollToBottom();
-
-        // Highlight new code blocks
-        messageElement.querySelectorAll('pre code').forEach((block) => {
-            hljs.highlightElement(block);
-        });
-
-        // Add to current session (either real session or draft)
-        const currentSession = this.getCurrentSession();
-        if (currentSession) {
-            currentSession.messages.push({
-                content,
-                sender,
-                timestamp: Date.now()
-            });
-            currentSession.updatedAt = Date.now();
-        }
-    }
-
-    getCurrentSession() {
-        // Return draft session if it exists, otherwise find in sessions array
-        if (this.draftSession && this.draftSession.id === this.currentSessionId) {
-            return this.draftSession;
-        }
-        return this.sessions.find(session => session.id === this.currentSessionId);
-    }
-
-    switchToSession(sessionId) {
-        // If switching away from a draft session, discard it
-        if (this.draftSession && this.draftSession.id === this.currentSessionId && sessionId !== this.currentSessionId) {
-            this.draftSession = null;
-        }
-
-        // Close settings if they are open when switching to a session
-        const settingsContainer = document.querySelector('.settings-container');
-        const isSettingsOpen = settingsContainer && settingsContainer.classList.contains('active');
-        
-        if (isSettingsOpen) {
-            // Dispatch event to close settings
-            window.dispatchEvent(new CustomEvent('atlas-close-settings'));
-        }
-
-        this.currentSessionId = sessionId;
-        this.clearMessages();
-        
-        const session = this.getCurrentSession();
-        if (session) {
-            // Check if session has messages to determine layout
-            const hasMessages = session.messages && session.messages.length > 0;
-            this.setWelcomeMode(!hasMessages);
-            
-            if (hasMessages) {
-                // Load session messages
-                session.messages.forEach(message => {
-                    this.addMessageToDOM(message.content, message.sender, message.timestamp);
-                });
-                
-                // Scroll to bottom after loading all messages
-                this.scrollToBottom(true);
-            } else {
-                // New session, update welcome phrase
-                this.updateWelcomePhrase();
-            }
-        }
-        
-        this.renderSessionList();
-        this.showSessionInterface();
-    }
-
-    renderSessionList() {
-        if (!this.sessionList) return;
-
-        this.sessionList.innerHTML = '';
-        
-        // Only render non-draft sessions
-        this.sessions.filter(session => !session.isDraft).forEach(session => {
-            const sessionItem = document.createElement('button');
-            sessionItem.className = `session-item ${session.id === this.currentSessionId ? 'active' : ''}`;
-            
-            sessionItem.innerHTML = `
-                <span class="session-item-text">${session.title}</span>
-                <button class="session-delete-btn" data-session-id="${session.id}" title="Delete session">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M6 7H5v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7H6zM8 9v10h1V9H8zm3 0v10h1V9h-1zm3 0v10h1V9h-1z"/>
-                        <path d="M15.5 4H14V3a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1H8.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1z"/>
-                    </svg>
-                </button>
-            `;
-            
-            // Handle session click (switch to session)
-            sessionItem.addEventListener('click', (e) => {
-                // Don't switch session if delete button was clicked
-                if (e.target.closest('.session-delete-btn')) {
-                    return;
-                }
-                this.switchToSession(session.id);
-            });
-
-            // Handle delete button click
-            const deleteBtn = sessionItem.querySelector('.session-delete-btn');
-            deleteBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.deleteSession(session.id);
-            });
-            
-            this.sessionList.appendChild(sessionItem);
-        });
-    }
-
-    deleteSession(sessionId) {
-        // Find session index
-        const sessionIndex = this.sessions.findIndex(session => session.id === sessionId);
-        if (sessionIndex === -1) return;
-
-        const session = this.sessions[sessionIndex];
-        
-        // Confirm deletion
-        if (!confirm(`Delete session "${session.title}"?`)) {
-            return;
-        }
-
-        // Remove session from array
-        this.sessions.splice(sessionIndex, 1);
-
-        // If this was the current session, handle switching to another session or home
-        if (this.currentSessionId === sessionId) {
-            if (this.sessions.length > 0) {
-                // Switch to the most recent session
-                const mostRecentSession = this.sessions[0];
-                this.switchToSession(mostRecentSession.id);
-            } else {
-                // No sessions left, go to home
-                this.currentSessionId = null;
-                this.hideSessionInterface();
-            }
-        }
-
-        // Update UI and save
-        this.renderSessionList();
-        this.saveSessionHistory();
-    }
-
-    clearMessages() {
-        if (this.sessionMessages) {
-            this.sessionMessages.innerHTML = '';
-        }
-    }
-
-    async getAssistantResponse() {
-        const currentSession = this.getCurrentSession();
-        if (!currentSession) return;
-
-        this.showTypingIndicator();
-
-        try {
-            // Map messages to the format expected by the API: { role, content }
-            const prompts = currentSession.messages.map(msg => ({
-                role: msg.sender,
-                content: msg.content
-            }));
-
-            const response = await fetch('https://rds.teamcardinalis.com/atlas/prompt', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ prompts: prompts })
-            });
-
-            this.hideTypingIndicator();
-
-            if (!response.ok) {
-                // Try to get error details from the body, but handle cases where it's empty
-                let errorText = '';
-                try {
-                    errorText = await response.text();
-                } catch (e) {
-                    // Ignore if body is empty or already read
-                }
-                const errorMessage = `API Error: ${response.status} - ${errorText || response.statusText || 'Failed to fetch response.'}`;
-                this.addMessage(errorMessage, 'assistant');
-                console.error(errorMessage);
-                this.saveSessionHistory();
-                return;
-            }
-
-            const data = await response.json();
-            const assistantMessage = data.response || "Sorry, I couldn't get a response.";
-            
-            this.addMessage(assistantMessage, 'assistant');
-            this.saveSessionHistory();
-
-        } catch (error) {
-            this.hideTypingIndicator();
-            const errorMessage = `Network Error: ${error.message}`;
-            this.addMessage(errorMessage, 'assistant');
-            console.error('Error fetching assistant response:', error);
-            this.saveSessionHistory();
-        }
-    }
-
-    showTypingIndicator() {
-        // Create typing indicator element
-        const typingElement = document.createElement('div');
-        typingElement.className = 'typing-indicator active';
-        typingElement.innerHTML = `
-            <div class="message-bubble">
-                <span class="typing-dots">Assistant is typing</span>
-            </div>
-        `;
-        
-        // Add to messages container
-        this.sessionMessages.appendChild(typingElement);
-        this.typingIndicator = typingElement;
-        this.scrollToBottom();
-    }
-
-    hideTypingIndicator() {
-        if (this.typingIndicator && this.typingIndicator.parentNode) {
-            this.typingIndicator.parentNode.removeChild(this.typingIndicator);
-            this.typingIndicator = null;
-        }
-    }
-
     autoResizeTextarea(textarea) {
         if (!textarea) return;
         
@@ -536,168 +332,7 @@ export class SessionManager {
         textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px';
     }
 
-    scrollToBottom(force = false) {
-        if (this.sessionMessages) {
-            // Use longer timeout for forced scroll (when switching sessions)
-            const delay = force ? 200 : 100;
-            setTimeout(() => {
-                this.sessionMessages.scrollTop = this.sessionMessages.scrollHeight;
-                
-                // Double-check after a bit more time for dynamic content
-                if (force) {
-                    setTimeout(() => {
-                        this.sessionMessages.scrollTop = this.sessionMessages.scrollHeight;
-                    }, 100);
-                }
-            }, delay);
-        }
-    }
-
-    escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    formatMessageContent(text) {
-        const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
-        let lastIndex = 0;
-        let result = '';
-        let match;
-
-        while ((match = codeBlockRegex.exec(text)) !== null) {
-            // Text before the code block
-            const precedingText = text.substring(lastIndex, match.index);
-            result += this.escapeHtml(precedingText).replace(/\n/g, '<br>');
-
-            // The code block
-            const language = match[1] || 'plaintext';
-            const code = match[2];
-            
-            result += `
-                <div class="code-block-wrapper">
-                    <div class="code-block-header">
-                        <span class="language-name">${this.escapeHtml(language)}</span>
-                        <button class="copy-code-btn" title="Copy code">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <pre><code class="language-${this.escapeHtml(language)}">${this.escapeHtml(code)}</code></pre>
-                </div>
-            `;
-            
-            lastIndex = match.index + match[0].length;
-        }
-
-        // Remaining text after the last code block
-        const remainingText = text.substring(lastIndex);
-        result += this.escapeHtml(remainingText).replace(/\n/g, '<br>');
-
-        return result;
-    }
-
-    saveSessionHistory() {
-        // Only save non-draft sessions
-        const sessionsToSave = this.sessions.filter(session => !session.isDraft);
-        localStorage.setItem('atlas-sessions', JSON.stringify(sessionsToSave));
-        
-        // Only save current session if it's not a draft
-        const currentSession = this.getCurrentSession();
-        if (currentSession && !currentSession.isDraft) {
-            localStorage.setItem('atlas-current-session', this.currentSessionId || '');
-        }
-        
-        localStorage.setItem('atlas-session-active', this.sessionContainer?.classList.contains('active') ? 'true' : 'false');
-        localStorage.setItem('atlas-first-message', this.isFirstMessage ? 'true' : 'false');
-    }
-
-    loadSessionHistory() {
-        const savedSessions = localStorage.getItem('atlas-sessions');
-        const currentSessionId = localStorage.getItem('atlas-current-session');
-        const isSessionActive = localStorage.getItem('atlas-session-active') === 'true';
-        const isFirstMessage = localStorage.getItem('atlas-first-message');
-        
-        if (isFirstMessage !== null) {
-            this.isFirstMessage = isFirstMessage === 'true';
-        }
-
-        if (savedSessions) {
-            this.sessions = JSON.parse(savedSessions);
-            this.renderSessionList();
-        }
-
-        if (currentSessionId && this.sessions.find(s => s.id === currentSessionId)) {
-            this.currentSessionId = currentSessionId;
-            
-            if (isSessionActive) {
-                this.switchToSession(currentSessionId);
-            }
-        }
-    }
-
-    addMessageToDOM(content, sender, timestamp) {
-        const messageElement = document.createElement('div');
-        messageElement.className = `message ${sender}`;
-        
-        const date = new Date(timestamp);
-        const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        
-        messageElement.innerHTML = `
-            <div class="message-bubble">
-                ${this.formatMessageContent(content)}
-            </div>
-            <span class="message-timestamp">${timeString}</span>
-        `;
-
-        this.sessionMessages.appendChild(messageElement);
-
-        // Highlight new code blocks
-        messageElement.querySelectorAll('pre code').forEach((block) => {
-            hljs.highlightElement(block);
-        });
-    }
-
-    async handleCopyCode(button) {
-        const wrapper = button.closest('.code-block-wrapper');
-        const codeElement = wrapper?.querySelector('code');
-        if (!codeElement) return;
-
-        const codeToCopy = codeElement.textContent;
-        
-        try {
-            await navigator.clipboard.writeText(codeToCopy);
-            
-            // Visual feedback
-            button.classList.add('copied');
-
-            setTimeout(() => {
-                button.classList.remove('copied');
-            }, 2000);
-
-        } catch (err) {
-            console.error('Failed to copy code: ', err);
-        }
-    }
-
-    clearAllSessions() {
-        this.sessions = [];
-        this.currentSessionId = null;
-        this.draftSession = null; // Clear draft session too
-        this.isFirstMessage = true;
-        this.clearMessages();
-        this.renderSessionList();
-        
-        if (this.sessionContainer) {
-            this.sessionContainer.classList.remove('active');
-        }
-        
-        this.saveSessionHistory();
-    }
-
     showSessionInterface() {
-        // Force close settings first
         const settingsContainer = document.querySelector('.settings-container');
         if (settingsContainer && settingsContainer.classList.contains('active')) {
             window.dispatchEvent(new CustomEvent('atlas-close-settings'));
@@ -706,23 +341,29 @@ export class SessionManager {
         if (this.sessionContainer) {
             this.sessionContainer.classList.add('active');
         }
-        this.saveSessionHistory();
     }
 
     hideSessionInterface() {
         if (this.sessionContainer) {
             this.sessionContainer.classList.remove('active');
         }
-        this.saveSessionHistory();
+    }
+
+    clearAllSessions() {
+        this.stateManager.clearAllSessions();
+        this.messageManager.clearMessages();
+        this.renderSessionList();
+        
+        if (this.sessionContainer) {
+            this.sessionContainer.classList.remove('active');
+        }
     }
 
     handleFirstMessage(message) {
         console.log('Handling first message:', message);
         
-        // Always create a new session for first message
         this.createNewSession();
         
-        // Wait for session creation then send message
         setTimeout(() => {
             if (this.welcomeInput) {
                 this.welcomeInput.value = message;
@@ -732,12 +373,10 @@ export class SessionManager {
     }
 
     updateSessionTitle(message) {
-        const currentSession = this.getCurrentSession();
+        const currentSession = this.stateManager.getCurrentSession();
         if (currentSession && currentSession.title === 'New Session') {
-            // Use first 30 characters of message as title
             currentSession.title = message.length > 30 ? message.substring(0, 30) + '...' : message;
             
-            // Only update the session list if it's not a draft
             if (!currentSession.isDraft) {
                 this.renderSessionList();
             }
