@@ -13,6 +13,7 @@ class AtlasApp {
         this.modalManager = null;
         this.navigationManager = null;
         this.sessionManager = null;
+        this.deferredPrompt = null;
         this.init();
     }
 
@@ -21,6 +22,8 @@ class AtlasApp {
             await this.waitForDOM();
             this.initializeModules();
             this.setupNavigationHandling();
+            this.setupPWAHandling();
+            this.handleURLParameters();
             console.log('ATLAS application initialized successfully');
         } catch (error) {
             console.error('Failed to initialize ATLAS application:', error);
@@ -92,6 +95,69 @@ class AtlasApp {
                     this.settingsManager.closeSettings();
                 }
                 break;
+        }
+    }
+
+    setupPWAHandling() {
+        // Handle PWA installation prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            this.deferredPrompt = e;
+            this.showInstallPrompt();
+        });
+
+        // Handle PWA installation success
+        window.addEventListener('appinstalled', () => {
+            console.log('ATLAS PWA installed successfully');
+            this.deferredPrompt = null;
+        });
+
+        // Handle app launch from installed PWA
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            console.log('ATLAS running as installed PWA');
+            document.body.classList.add('pwa-mode');
+        }
+    }
+
+    handleURLParameters() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const action = urlParams.get('action');
+        
+        switch (action) {
+            case 'new-session':
+                setTimeout(() => {
+                    window.dispatchEvent(new CustomEvent('atlas-create-new-session', {
+                        detail: { source: 'pwa-shortcut' }
+                    }));
+                }, 500);
+                break;
+            case 'settings':
+                setTimeout(() => {
+                    if (this.settingsManager) {
+                        this.settingsManager.openSettings();
+                    }
+                }, 500);
+                break;
+        }
+        
+        // Clean URL after handling parameters
+        if (action) {
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+    }
+
+    showInstallPrompt() {
+        // You can customize this to show a proper install button in your UI
+        console.log('PWA installation available');
+        // Example: Add an install button to your settings or main UI
+    }
+
+    async installPWA() {
+        if (this.deferredPrompt) {
+            this.deferredPrompt.prompt();
+            const { outcome } = await this.deferredPrompt.userChoice;
+            console.log(`PWA install prompt result: ${outcome}`);
+            this.deferredPrompt = null;
         }
     }
 }

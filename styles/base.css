@@ -18,3 +18,37 @@ body {
   min-height: var(--viewport-min-height);
   overflow-x: hidden;
 }
+
+/* PWA specific styles */
+.pwa-mode {
+  /* Add any PWA-specific styling here */
+  --sidebar-margin: 5px; /* Slightly reduce margins in PWA mode */
+}
+
+@media (display-mode: standalone) {
+  /* Styles when running as installed PWA */
+  body {
+    user-select: none; /* Prevent text selection in app mode */
+  }
+  
+  .main-content {
+    /* Adjust for PWA window chrome */
+    margin-left: calc(var(--sidebar-width) + var(--sidebar-margin) * 2);
+  }
+}
+
+/* Prevent context menu in PWA mode */
+.pwa-mode * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.pwa-mode input,
+.pwa-mode textarea {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
