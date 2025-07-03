@@ -175,8 +175,8 @@ export class SessionManager {
         }
 
         this.setWelcomeMode(false);
-        await this.processMessage(message);
         this.welcomeInput.value = '';
+        await this.processMessage(message);
     }
 
     async sendMessage() {
@@ -190,9 +190,9 @@ export class SessionManager {
             return;
         }
 
-        await this.processMessage(message);
         this.sessionInput.value = '';
         this.autoResizeTextarea(this.sessionInput);
+        await this.processMessage(message);
     }
 
     async processMessage(content) {
